@@ -1,0 +1,190 @@
+-- =============================================================================
+-- AERO PREMIUM UI LIBRARY SOURCE
+-- =============================================================================
+local Library = {}
+
+function Library:CreateWindow(hubName)
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "AeroDynamicHub"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.DisplayOrder = 100
+    
+    local successo = pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end)
+    if not successo then ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui") end
+    
+    -- Main Frame
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 480, 0, 350)
+    MainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 17)
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+    
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 10)
+    UICorner.Parent = MainFrame
+    
+    local UIStroke = Instance.new("UIStroke")
+    UIStroke.Color = Color3.fromRGB(35, 35, 40)
+    UIStroke.Thickness = 1.5
+    UIStroke.Parent = MainFrame
+
+    -- TopBar Titolo
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 40)
+    Title.BackgroundTransparency = 1
+    Title.Text = "   " .. hubName:upper()
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 13
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = MainFrame
+    
+    -- Sidebar (Contenitore Tab)
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Size = UDim2.new(0, 130, 1, -40)
+    Sidebar.Position = UDim2.new(0, 0, 0, 40)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(9, 9, 11)
+    Sidebar.Parent = MainFrame
+    
+    local SidebarCorner = Instance.new("UICorner")
+    SidebarCorner.CornerRadius = UDim.new(0, 10)
+    SidebarCorner.Parent = Sidebar
+    
+    local SidebarList = Instance.new("UIListLayout")
+    SidebarList.Padding = UDim.new(0, 6)
+    SidebarList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    SidebarList.Parent = Sidebar
+    
+    -- Container dei contenuti dei Tab
+    local Container = Instance.new("Frame")
+    Container.Size = UDim2.new(1, -140, 1, -50)
+    Container.Position = UDim2.new(0, 135, 0, 45)
+    Container.BackgroundTransparency = 1
+    Container.Parent = MainFrame
+    
+    local Hub = { Tabs = {}, Buttons = {}, CurrentTab = nil }
+    
+    -- FUNZIONE CREAZIONE TAB
+    function Hub:CreateTab(tabName)
+        local TabPage = Instance.new("ScrollingFrame")
+        TabPage.Size = UDim2.new(1, 0, 1, 0)
+        TabPage.BackgroundTransparency = 1
+        TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
+        TabPage.AutomaticSize = Enum.AutomaticSize.Y
+        TabPage.ScrollBarThickness = 3
+        TabPage.Visible = false
+        TabPage.Parent = Container
+        
+        local TabList = Instance.new("UIListLayout")
+        TabList.Padding = UDim.new(0, 6)
+        TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        TabList.Parent = TabPage
+        
+        local TabBtn = Instance.new("TextButton")
+        TabBtn.Size = UDim2.new(0.9, 0, 0, 32)
+        TabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+        TabBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+        TabBtn.Font = Enum.Font.GothamSemibold
+        TabBtn.TextSize = 11
+        TabBtn.Text = tabName:upper()
+        TabBtn.Parent = Sidebar
+        
+        local BtnCorner = Instance.new("UICorner")
+        BtnCorner.CornerRadius = UDim.new(0, 6)
+        BtnCorner.Parent = TabBtn
+        
+        TabBtn.MouseButton1Click:Connect(function()
+            for _, page in pairs(Hub.Tabs) do page.Visible = false end
+            for _, btn in pairs(Hub.Buttons) do 
+                btn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+                btn.TextColor3 = Color3.fromRGB(150, 150, 150)
+            end
+            TabPage.Visible = true
+            TabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+            TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end)
+        
+        if not Hub.CurrentTab then
+            TabPage.Visible = true
+            TabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+            TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Hub.CurrentTab = TabPage
+        end
+        
+        table.insert(Hub.Tabs, TabPage)
+        table.insert(Hub.Buttons, TabBtn)
+        
+        local Elements = {}
+        
+        -- FUNZIONE COSTRUZIONE TOGGLE CON SOTTO-DESCRIZIONE AUTOMATICA
+        function Elements:AddToggle(titleText, descText, defaultState, callback)
+            local Box = Instance.new("Frame")
+            Box.Size = UDim2.new(0.96, 0, 0, 52)
+            Box.AutomaticSize = Enum.AutomaticSize.Y
+            Box.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+            Box.Parent = TabPage
+            
+            local BoxCorner = Instance.new("UICorner")
+            BoxCorner.CornerRadius = UDim.new(0, 6)
+            BoxCorner.Parent = Box
+            
+            local TitleLabel = Instance.new("TextLabel")
+            TitleLabel.Size = UDim2.new(0.7, 0, 0, 22)
+            TitleLabel.Position = UDim2.new(0.04, 0, 0, 4)
+            TitleLabel.BackgroundTransparency = 1
+            TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TitleLabel.Font = Enum.Font.GothamBold
+            TitleLabel.TextSize = 12
+            TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+            TitleLabel.Text = titleText
+            TitleLabel.Parent = Box
+            
+            local DescLabel = Instance.new("TextLabel")
+            DescLabel.Size = UDim2.new(0.7, 0, 0, 22)
+            DescLabel.Position = UDim2.new(0.04, 0, 0, 24)
+            DescLabel.BackgroundTransparency = 1
+            DescLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+            DescLabel.Font = Enum.Font.Gotham
+            DescLabel.TextSize = 10
+            DescLabel.TextXAlignment = Enum.TextXAlignment.Left
+            DescLabel.TextWrapped = true
+            DescLabel.Text = descText
+            DescLabel.Parent = Box
+            
+            local ToggleBtn = Instance.new("TextButton")
+            ToggleBtn.Size = UDim2.new(0, 48, 0, 24)
+            ToggleBtn.Position = UDim2.new(0.78, 0, 0.25, 0)
+            ToggleBtn.Font = Enum.Font.GothamBold
+            ToggleBtn.TextSize = 10
+            ToggleBtn.Parent = Box
+            
+            local TCorner = Instance.new("UICorner")
+            TCorner.CornerRadius = UDim.new(0, 4)
+            TCorner.Parent = ToggleBtn
+            
+            local state = defaultState
+            local function update()
+                ToggleBtn.Text = state and "ON" or "OFF"
+                ToggleBtn.BackgroundColor3 = state and Color3.fromRGB(46, 117, 89) or Color3.fromRGB(117, 46, 46)
+                ToggleBtn.TextColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+            end
+            update()
+            
+            ToggleBtn.MouseButton1Click:Connect(function()
+                state = not state
+                update()
+                callback(state)
+            end)
+            return Box
+        end
+        
+        return Elements
+    end
+    
+    return Hub
+end
+
+return Library
