@@ -27,8 +27,8 @@ function Library:Inizializza(titoloHub)
     MainFrame.Name = "MainFrame"
     MainFrame.Size = UDim2.new(0, 520, 0, 340)
     MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 13, 20) -- Sfondo scuro violaceo
-    MainFrame.Visible = false
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 13, 20)
+    MainFrame.Visible = true -- Impostato a true di default per vedere subito se carica
     MainFrame.Active = true
     MainFrame.Draggable = true
     MainFrame.Parent = ScreenGui
@@ -37,10 +37,9 @@ function Library:Inizializza(titoloHub)
     UICornerFrame.CornerRadius = UDim.new(0, 10)
     UICornerFrame.Parent = MainFrame
 
-    -- Bordo Viola Sfumato (UIStroke)
     local UIStrokeFrame = Instance.new("UIStroke")
     UIStrokeFrame.Thickness = 1.5
-    UIStrokeFrame.Color = Color3.fromRGB(130, 50, 250) -- Viola Acceso
+    UIStrokeFrame.Color = Color3.fromRGB(130, 50, 250)
     UIStrokeFrame.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     UIStrokeFrame.Parent = MainFrame
 
@@ -55,7 +54,6 @@ function Library:Inizializza(titoloHub)
     TopBarCorner.CornerRadius = UDim.new(0, 10)
     TopBarCorner.Parent = TopBar
 
-    -- Nasconde gli angoli bassi della barra superiore per non rovinare il design
     local TopBarLine = Instance.new("Frame")
     TopBarLine.Size = UDim2.new(1, 0, 0, 5)
     TopBarLine.Position = UDim2.new(0, 0, 1, -5)
@@ -87,7 +85,7 @@ function Library:Inizializza(titoloHub)
     ToggleMenuBtn.Parent = ScreenGui
 
     local UICornerBtn = Instance.new("UICorner")
-    UICornerBtn.CornerRadius = UDim.new(1, 0) -- Rotondo stile Redz Floating
+    UICornerBtn.CornerRadius = UDim.new(1, 0)
     UICornerBtn.Parent = ToggleMenuBtn
     
     local ToggleStroke = Instance.new("UIStroke")
@@ -99,7 +97,7 @@ function Library:Inizializza(titoloHub)
         MainFrame.Visible = not MainFrame.Visible
     end)
 
-    -- Sidebar Sinistra per le Tab (Stile Compatto Redz)
+    -- Sidebar Sinistra per le Tab
     local SideBar = Instance.new("ScrollingFrame")
     SideBar.Size = UDim2.new(0, 140, 1, -45)
     SideBar.Position = UDim2.new(0, 5, 0, 40)
@@ -124,7 +122,6 @@ function Library:Inizializza(titoloHub)
 
     local InterfacciaEngine = { tabs = {}, tabButtons = {} }
 
-    -- Funzione per Creare una Tab
     function InterfacciaEngine:CreaTab(name, order)
         local contentFrame = Instance.new("ScrollingFrame")
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
@@ -143,7 +140,6 @@ function Library:Inizializza(titoloHub)
 
         self.tabs[name] = contentFrame
 
-        -- Bottone Tab in Sidebar
         local tabBtn = Instance.new("TextButton")
         tabBtn.Size = UDim2.new(0.95, 0, 0, 32)
         tabBtn.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
@@ -181,7 +177,6 @@ function Library:Inizializza(titoloHub)
         return contentFrame
     end
 
-    -- Funzione per inserire Toggle (Stile Redz Hub Neon)
     function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.98, 0, 0, 45)
@@ -220,7 +215,6 @@ function Library:Inizializza(titoloHub)
         descLabel.Text = descText
         descLabel.Parent = container
 
-        -- Switch Esterno dello slider
         local toggleBg = Instance.new("Frame")
         toggleBg.Size = UDim2.new(0, 38, 0, 20)
         toggleBg.Position = UDim2.new(0.95, -38, 0.5, -10)
@@ -231,7 +225,6 @@ function Library:Inizializza(titoloHub)
         toggleBgCorner.CornerRadius = UDim.new(1, 0)
         toggleBgCorner.Parent = toggleBg
 
-        -- Pallina dello Switch
         local toggleBall = Instance.new("Frame")
         toggleBall.Size = UDim2.new(0, 14, 0, 14)
         toggleBall.Position = UDim2.new(0, 3, 0, 3)
@@ -274,7 +267,6 @@ function Library:Inizializza(titoloHub)
         return container
     end
 
-    -- Funzione per inserire Dropdown Selettori (Stile Compatto Minimal Viola)
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
         local dropContainer = Instance.new("Frame")
         dropContainer.Size = UDim2.new(0.98, 0, 0, 32)
@@ -284,7 +276,7 @@ function Library:Inizializza(titoloHub)
         local dropBtn = Instance.new("TextButton")
         dropBtn.Size = UDim2.new(1, 0, 1, 0)
         dropBtn.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
-        dropBtn.TextColor3 = Color3.fromRGB(200, 160, 255) -- Testo Viola Soft
+        dropBtn.TextColor3 = Color3.fromRGB(200, 160, 255)
         dropBtn.Font = Enum.Font.GothamBold
         dropBtn.TextSize = 11
         dropBtn.Text = defaultText .. "  ▼"
@@ -348,7 +340,6 @@ function Library:Inizializza(titoloHub)
         end)
     end
 
-    -- Forza l'apertura automatica della prima Tab rilevata
     task.spawn(function()
         task.wait(0.1)
         for name, frame in pairs(InterfacciaEngine.tabs) do
