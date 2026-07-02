@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (TOTAL DROPDOWN FIX & ACID GREEN)
+-- SCORPION X - UI LIBRARY ENGINE (DYNAMIC LAYOUT ADAPTATION - NO OVERLAP)
 -- =============================================================================
 local Library = {}
 
@@ -20,14 +20,14 @@ function Library:Inizializza(titoloHub)
     local successo = pcall(function() ScreenGui.Parent = CoreGui end)
     if not successo then ScreenGui.Parent = playerGui end
 
-    -- MAIN FRAME (Nero opaco)
+    -- MAIN FRAME
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Size = UDim2.new(0, 520, 0, 340)
     MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
     MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     MainFrame.Active = true
-    MainFrame.Draggable = true
+    MainFrame.Draggable = true -- Si muove e trascina tutto perfettamente
     MainFrame.Visible = true
     MainFrame.Parent = ScreenGui
 
@@ -35,10 +35,9 @@ function Library:Inizializza(titoloHub)
     UICornerFrame.CornerRadius = UDim.new(0, 10)
     UICornerFrame.Parent = MainFrame
 
-    -- BORDO VERDE ACIDO
     local UIStrokeFrame = Instance.new("UIStroke")
     UIStrokeFrame.Thickness = 1.5
-    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0)
+    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0) -- Verde Acido
     UIStrokeFrame.Parent = MainFrame
 
     local TopBar = Instance.new("Frame")
@@ -62,7 +61,6 @@ function Library:Inizializza(titoloHub)
     TitleLabel.Text = tostring(titoloHub):upper()
     TitleLabel.Parent = TopBar
 
-    -- BOTTONE MOBILE APERTURA (SCO X)
     local ToggleMenuBtn = Instance.new("TextButton")
     ToggleMenuBtn.Name = "ToggleMenuBtn"
     ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
@@ -77,6 +75,10 @@ function Library:Inizializza(titoloHub)
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(1, 0)
     UICornerBtn.Parent = ToggleMenuBtn
+
+    ToggleMenuBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = not MainFrame.Visible
+    end)
 
     local SideBar = Instance.new("ScrollingFrame")
     SideBar.Name = "SideBar"
@@ -99,16 +101,7 @@ function Library:Inizializza(titoloHub)
     ContentContainer.BackgroundTransparency = 1
     ContentContainer.Parent = MainFrame
 
-    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil }
-
-    -- Chiusura di sicurezza dei dropdown se si chiude il menu principale
-    ToggleMenuBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = not MainFrame.Visible
-        if not MainFrame.Visible then
-            local vecchioMenu = ScreenGui:FindFirstChild("DropdownMenuGlobale")
-            if vecchioMenu then vecchioMenu:Destroy() end
-        end
-    end)
+    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil }
 
     function InterfacciaEngine:CreaTab(name, order)
         local contentFrame = Instance.new("ScrollingFrame")
@@ -119,6 +112,7 @@ function Library:Inizializza(titoloHub)
         contentFrame.ScrollBarThickness = 3
         contentFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 255, 0)
         contentFrame.Visible = false
+        contentFrame.ClipsDescendants = true -- Taglia gli elementi solo se superano i confini della Tab stessa
         contentFrame.Parent = ContentContainer
 
         local listLayout = Instance.new("UIListLayout")
@@ -156,19 +150,22 @@ function Library:Inizializza(titoloHub)
         if not self.primaTab then self.primaTab = name end
 
         tabBtn.MouseButton1Click:Connect(function()
-            local vecchioMenu = ScreenGui:FindFirstChild("DropdownMenuGlobale")
-            if vecchioMenu then vecchioMenu:Destroy() end
-
+            -- Chiude i dropdown aperti quando cambi Tab per evitare bug visivi
+            if self.activeDropdownFrame then
+                self.activeDropdownFrame.Visible = false
+                self.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
+                self.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                self.activeDropdownFrame = nil
+                self.activeDropdownContainer = nil
+            end
             for tName, frame in pairs(self.tabs) do frame.Visible = (tName == name) end
             for bName, btn in pairs(self.tabButtons) do
                 if bName == name then
                     btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
                     btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-                    btn.UIStroke.Color = Color3.fromRGB(200, 255, 100)
                 else
                     btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
                     btn.TextColor3 = Color3.fromRGB(180, 180, 180)
-                    btn.UIStroke.Color = Color3.fromRGB(40, 40, 40)
                 end
             end
         end)
@@ -181,6 +178,7 @@ function Library:Inizializza(titoloHub)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 48)
         container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+        container.SortOrder = Enum.SortOrder.LayoutOrder
         container.Parent = parentTab
 
         local corner = Instance.new("UICorner")
@@ -258,13 +256,16 @@ function Library:Inizializza(titoloHub)
     end
 
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
+        -- Il container conterrà sia il bottone che la lista
         local dropContainer = Instance.new("Frame")
-        dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
+        dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Altezza base chiusa = 35
         dropContainer.BackgroundTransparency = 1
+        dropContainer.ClipsDescendants = true -- Evita che la lista si veda fuori dal container quando è chiusa
+        dropContainer.SortOrder = Enum.SortOrder.LayoutOrder
         dropContainer.Parent = parentTab
 
         local dropBtn = Instance.new("TextButton")
-        dropBtn.Size = UDim2.new(1, 0, 1, 0)
+        dropBtn.Size = UDim2.new(1, 0, 0, 35) -- Altezza fissa del bottone primario
         dropBtn.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
         dropBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
         dropBtn.Font = Enum.Font.SourceSansBold
@@ -282,52 +283,80 @@ function Library:Inizializza(titoloHub)
         dropStroke.Color = Color3.fromRGB(50, 50, 50)
         dropStroke.Parent = dropBtn
 
-        -- LOGICA FIX: Creazione del menu sovrapposto assoluto
+        -- LISTA SCROLLABILE INTERNA: Si adatta e spinge i toggle sotto
+        local dropListFrame = Instance.new("ScrollingFrame")
+        dropListFrame.Name = "DropList"
+        dropListFrame.Size = UDim2.new(1, 0, 0, 0) -- Parte da altezza 0
+        dropListFrame.Position = UDim2.new(0, 0, 0, 38)
+        dropListFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+        dropListFrame.Visible = false
+        dropListFrame.ScrollBarThickness = 3
+        dropListFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 255, 0)
+        dropListFrame.CanvasSize = UDim2.new(0, 0, 0, #options * 30)
+        dropListFrame.Parent = dropContainer
+        
+        local dCorner = Instance.new("UICorner")
+        dCorner.CornerRadius = UDim.new(0, 6)
+        dCorner.Parent = dropListFrame
+
+        local dStroke = Instance.new("UIStroke")
+        dStroke.Thickness = 1
+        dStroke.Color = Color3.fromRGB(150, 255, 0)
+        dStroke.Parent = dropListFrame
+
+        local dropLayout = Instance.new("UIListLayout")
+        dropLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        dropLayout.Parent = dropListFrame
+
+        for i, val in ipairs(options) do
+            local opt = Instance.new("TextButton")
+            opt.Size = UDim2.new(1, 0, 0, 30)
+            opt.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            opt.TextColor3 = Color3.fromRGB(255, 255, 255)
+            opt.Font = Enum.Font.SourceSans
+            opt.TextSize = 12
+            opt.Text = "   " .. tostring(val.Text or val)
+            opt.TextXAlignment = Enum.TextXAlignment.Left
+            opt.LayoutOrder = i
+            opt.Parent = dropListFrame
+
+            opt.Activated:Connect(function()
+                dropBtn.Text = "  " .. tostring(val.Text or val):upper() .. "  ▼"
+                dropListFrame.Visible = false
+                dropListFrame.Size = UDim2.new(1, 0, 0, 0)
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Rimpicciolisce il contenitore e rialza i toggle
+                InterfacciaEngine.activeDropdownFrame = nil
+                InterfacciaEngine.activeDropdownContainer = nil
+                callback(val.Value or val)
+            end)
+        end
+
         dropBtn.Activated:Connect(function()
-            local vecchioMenu = ScreenGui:FindFirstChild("DropdownMenuGlobale")
-            if vecchioMenu then
-                vecchioMenu:Destroy()
-                return
-            end
-
-            local menuLista = Instance.new("Frame")
-            menuLista.Name = "DropdownMenuGlobale"
-            menuLista.Size = UDim2.new(0, dropBtn.AbsoluteSize.X, 0, #options * 30)
-            menuLista.Position = UDim2.new(0, dropBtn.AbsolutePosition.X, 0, dropBtn.AbsolutePosition.Y + dropBtn.AbsoluteSize.Y + 35)
-            menuLista.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-            menuLista.ZIndex = 200
-            menuLista.Parent = ScreenGui
-
-            local mCorner = Instance.new("UICorner")
-            mCorner.CornerRadius = UDim.new(0, 6)
-            mCorner.Parent = menuLista
-
-            local mStroke = Instance.new("UIStroke")
-            mStroke.Thickness = 1
-            mStroke.Color = Color3.fromRGB(150, 255, 0)
-            mStroke.Parent = menuLista
-
-            local mLayout = Instance.new("UIListLayout")
-            mLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            mLayout.Parent = menuLista
-
-            for i, val in ipairs(options) do
-                local opt = Instance.new("TextButton")
-                opt.Size = UDim2.new(1, 0, 0, 30)
-                opt.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-                opt.TextColor3 = Color3.fromRGB(255, 255, 255)
-                opt.Font = Enum.Font.SourceSans
-                opt.TextSize = 12
-                opt.Text = "   " .. tostring(val.Text or val)
-                opt.TextXAlignment = Enum.TextXAlignment.Left
-                opt.ZIndex = 201
-                opt.Parent = menuLista
-
-                opt.Activated:Connect(function()
-                    dropBtn.Text = "  " .. tostring(val.Text or val):upper() .. "  ▼"
-                    callback(val.Value or val)
-                    menuLista:Destroy()
-                end)
+            if dropListFrame.Visible then
+                dropListFrame.Visible = false
+                dropListFrame.Size = UDim2.new(1, 0, 0, 0)
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Chiude e resetta lo spazio dei toggle
+                InterfacciaEngine.activeDropdownFrame = nil
+                InterfacciaEngine.activeDropdownContainer = nil
+            else
+                -- Se c'è un altro dropdown aperto in giro, lo chiude prima di aprire questo
+                if InterfacciaEngine.activeDropdownFrame and InterfacciaEngine.activeDropdownFrame ~= dropListFrame then
+                    InterfacciaEngine.activeDropdownFrame.Visible = false
+                    InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
+                    InterfacciaEngine.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                end
+                
+                dropListFrame.Visible = true
+                -- Scegli l'altezza massima dello scroll frame interno (es. massimo 120px, altrimenti scrolla)
+                local altezzaLista = math.min(#options * 30, 120)
+                
+                dropListFrame.Size = UDim2.new(1, 0, 0, altezzaLista)
+                -- ADATTAMENTO COMPLETO: Allunga il contenitore principale. 
+                -- Il UIListLayout della Tab leggerà questo cambio e sposterà i toggle in basso!
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 35 + altezzaLista + 5)
+                
+                InterfacciaEngine.activeDropdownFrame = dropListFrame
+                InterfacciaEngine.activeDropdownContainer = dropContainer
             end
         end)
     end
@@ -340,7 +369,6 @@ function Library:Inizializza(titoloHub)
             if btn then
                 btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
                 btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-                btn.UIStroke.Color = Color3.fromRGB(200, 255, 100)
             end
         end
     end)
