@@ -1,84 +1,124 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE
+-- SCORPION X - UI LIBRARY ENGINE (REDZ HUB STYLE)
 -- =============================================================================
 local Library = {}
 
 function Library:Inizializza(titoloHub)
     local Players = game:GetService("Players")
     local CoreGui = game:GetService("CoreGui")
+    local TweenService = game:GetService("TweenService")
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
 
     -- Pulizia istanze precedenti
-    local oldGui = playerGui:FindFirstChild("AeroAutoFarmMenu") or CoreGui:FindFirstChild("AeroAutoFarmMenu")
+    local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
     if oldGui then oldGui:Destroy() end
 
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "AeroAutoFarmMenu"
+    ScreenGui.Name = "ScorpioXMenu"
     ScreenGui.ResetOnSpawn = false
     ScreenGui.DisplayOrder = 100
 
     local successo = pcall(function() ScreenGui.Parent = CoreGui end)
     if not successo then ScreenGui.Parent = playerGui end
 
-    -- Finestra Principale
+    -- Finestra Principale (Stile Redz Hub - Dark & Viola)
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
-    MainFrame.Size = UDim2.new(0.4, 0, 0.6, 0)
-    MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 14)
+    MainFrame.Size = UDim2.new(0, 520, 0, 340)
+    MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 13, 20) -- Sfondo scuro violaceo
     MainFrame.Visible = false
     MainFrame.Active = true
     MainFrame.Draggable = true
     MainFrame.Parent = ScreenGui
 
-    local UIAspectRatio = Instance.new("UIAspectRatioConstraint")
-    UIAspectRatio.AspectRatio = 1.4
-    UIAspectRatio.AspectType = Enum.AspectType.ScaleWithParentSize
-    UIAspectRatio.Parent = MainFrame
-
     local UICornerFrame = Instance.new("UICorner")
-    UICornerFrame.CornerRadius = UDim.new(0, 12)
+    UICornerFrame.CornerRadius = UDim.new(0, 10)
     UICornerFrame.Parent = MainFrame
 
-    -- Bottone di attivazione
+    -- Bordo Viola Sfumato (UIStroke)
+    local UIStrokeFrame = Instance.new("UIStroke")
+    UIStrokeFrame.Thickness = 1.5
+    UIStrokeFrame.Color = Color3.fromRGB(130, 50, 250) -- Viola Acceso
+    UIStrokeFrame.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    UIStrokeFrame.Parent = MainFrame
+
+    -- Barra Superiore (TopBar)
+    local TopBar = Instance.new("Frame")
+    TopBar.Name = "TopBar"
+    TopBar.Size = UDim2.new(1, 0, 0, 35)
+    TopBar.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
+    TopBar.Parent = MainFrame
+
+    local TopBarCorner = Instance.new("UICorner")
+    TopBarCorner.CornerRadius = UDim.new(0, 10)
+    TopBarCorner.Parent = TopBar
+
+    -- Nasconde gli angoli bassi della barra superiore per non rovinare il design
+    local TopBarLine = Instance.new("Frame")
+    TopBarLine.Size = UDim2.new(1, 0, 0, 5)
+    TopBarLine.Position = UDim2.new(0, 0, 1, -5)
+    TopBarLine.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
+    TopBarLine.BorderSizePixel = 0
+    TopBarLine.Parent = TopBar
+
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Size = UDim2.new(1, -20, 1, 0)
+    TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.TextSize = 14
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.Text = "SCORPION X | " .. tostring(titoloHub):upper()
+    TitleLabel.Parent = TopBar
+
+    -- Bottone di attivazione mobile/desktop (Floating Purple Button)
     local ToggleMenuBtn = Instance.new("TextButton")
     ToggleMenuBtn.Name = "ToggleMenuBtn"
-    ToggleMenuBtn.Size = UDim2.new(0, 180, 0, 45)
-    ToggleMenuBtn.Position = UDim2.new(0, 20, 0.45, 0)
-    ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    ToggleMenuBtn.TextColor3 = Color3.fromRGB(240, 240, 240)
+    ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
+    ToggleMenuBtn.Position = UDim2.new(0, 20, 0.2, 0)
+    ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(130, 50, 250)
+    ToggleMenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     ToggleMenuBtn.Font = Enum.Font.GothamBold
     ToggleMenuBtn.TextSize = 12
-    ToggleMenuBtn.Text = "APRI " .. titoloHub:upper()
+    ToggleMenuBtn.Text = "SCO X"
     ToggleMenuBtn.Parent = ScreenGui
 
     local UICornerBtn = Instance.new("UICorner")
-    UICornerBtn.CornerRadius = UDim.new(0, 8)
+    UICornerBtn.CornerRadius = UDim.new(1, 0) -- Rotondo stile Redz Floating
     UICornerBtn.Parent = ToggleMenuBtn
+    
+    local ToggleStroke = Instance.new("UIStroke")
+    ToggleStroke.Thickness = 2
+    ToggleStroke.Color = Color3.fromRGB(255, 255, 255)
+    ToggleStroke.Parent = ToggleMenuBtn
 
     ToggleMenuBtn.MouseButton1Click:Connect(function()
         MainFrame.Visible = not MainFrame.Visible
-        ToggleMenuBtn.Text = MainFrame.Visible and "CHIUDI HUB" or "APRI " .. titoloHub:upper()
     end)
 
-    -- Sidebar Sinistra per le Tab
-    local SideBar = Instance.new("Frame")
-    SideBar.Size = UDim2.new(0.28, 0, 0.85, 0)
-    SideBar.Position = UDim2.new(0, 0, 0.15, 0)
-    SideBar.BackgroundColor3 = Color3.fromRGB(8, 8, 10)
+    -- Sidebar Sinistra per le Tab (Stile Compatto Redz)
+    local SideBar = Instance.new("ScrollingFrame")
+    SideBar.Size = UDim2.new(0, 140, 1, -45)
+    SideBar.Position = UDim2.new(0, 5, 0, 40)
+    SideBar.BackgroundTransparency = 1
+    SideBar.CanvasSize = UDim2.new(0, 0, 0, 0)
+    SideBar.AutomaticCanvasSize = Enum.AutomaticCanvasSize.Y
+    SideBar.ScrollBarThickness = 0
     SideBar.Parent = MainFrame
 
     local SideBarList = Instance.new("UIListLayout")
-    SideBarList.Padding = UDim.new(0.02, 0)
+    SideBarList.Padding = UDim.new(0, 5)
     SideBarList.HorizontalAlignment = Enum.HorizontalAlignment.Center
     SideBarList.SortOrder = Enum.SortOrder.LayoutOrder
     SideBarList.Parent = SideBar
 
-    -- Contenitore Principale
+    -- Contenitore Principale Elementi
     local ContentContainer = Instance.new("Frame")
-    ContentContainer.Size = UDim2.new(0.70, 0, 0.82, 0)
-    ContentContainer.Position = UDim2.new(0.29, 0, 0.16, 0)
+    ContentContainer.Size = UDim2.new(1, -155, 1, -45)
+    ContentContainer.Position = UDim2.new(0, 150, 0, 40)
     ContentContainer.BackgroundTransparency = 1
     ContentContainer.Parent = MainFrame
 
@@ -89,41 +129,50 @@ function Library:Inizializza(titoloHub)
         local contentFrame = Instance.new("ScrollingFrame")
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
         contentFrame.BackgroundTransparency = 1
-        contentFrame.CanvasSize = UDim2.new(0, 0, 1.4, 0)
-        contentFrame.ScrollBarThickness = 3
+        contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+        contentFrame.AutomaticCanvasSize = Enum.AutomaticCanvasSize.Y
+        contentFrame.ScrollBarThickness = 2
+        contentFrame.ScrollBarImageColor3 = Color3.fromRGB(130, 50, 250)
         contentFrame.Visible = false
         contentFrame.Parent = ContentContainer
 
         local listLayout = Instance.new("UIListLayout")
-        listLayout.Padding = UDim.new(0.03, 0)
+        listLayout.Padding = UDim.new(0, 6)
         listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
         listLayout.Parent = contentFrame
 
         self.tabs[name] = contentFrame
 
+        -- Bottone Tab in Sidebar
         local tabBtn = Instance.new("TextButton")
-        tabBtn.Size = UDim2.new(0.9, 0, 0.15, 0)
-        tabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-        tabBtn.TextColor3 = Color3.fromRGB(160, 160, 160)
+        tabBtn.Size = UDim2.new(0.95, 0, 0, 32)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
+        tabBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
         tabBtn.Font = Enum.Font.GothamSemibold
-        tabBtn.TextSize = 10
-        tabBtn.Text = name:upper()
+        tabBtn.TextSize = 11
+        tabBtn.Text = "  " .. name
+        tabBtn.TextXAlignment = Enum.TextXAlignment.Left
         tabBtn.LayoutOrder = order
         tabBtn.Parent = SideBar
 
         local btnCorner = Instance.new("UICorner")
         btnCorner.CornerRadius = UDim.new(0, 6)
         btnCorner.Parent = tabBtn
+        
+        local btnStroke = Instance.new("UIStroke")
+        btnStroke.Thickness = 1
+        btnStroke.Color = Color3.fromRGB(35, 30, 50)
+        btnStroke.Parent = tabBtn
 
         tabBtn.MouseButton1Click:Connect(function()
             for tName, frame in pairs(self.tabs) do frame.Visible = (tName == name) end
             for bName, btn in pairs(self.tabButtons) do
                 if bName == name then
-                    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-                    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(130, 50, 250), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+                    btn.UIStroke.Color = Color3.fromRGB(160, 90, 255)
                 else
-                    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-                    btn.TextColor3 = Color3.fromRGB(160, 160, 160)
+                    TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(22, 18, 30), TextColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+                    btn.UIStroke.Color = Color3.fromRGB(35, 30, 50)
                 end
             end
         end)
@@ -132,108 +181,143 @@ function Library:Inizializza(titoloHub)
         return contentFrame
     end
 
-    -- Funzione per inserire Toggle
+    -- Funzione per inserire Toggle (Stile Redz Hub Neon)
     function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
         local container = Instance.new("Frame")
-        container.Size = UDim2.new(0.95, 0, 0, 50)
-        container.AutomaticSize = Enum.AutomaticSize.Y
-        container.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+        container.Size = UDim2.new(0.98, 0, 0, 45)
+        container.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
         container.Parent = parentTab
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 6)
         corner.Parent = container
+        
+        local stroke = Instance.new("UIStroke")
+        stroke.Thickness = 1
+        stroke.Color = Color3.fromRGB(35, 30, 50)
+        stroke.Parent = container
 
         local titleLabel = Instance.new("TextLabel")
-        titleLabel.Size = UDim2.new(0.70, 0, 0, 20)
+        titleLabel.Size = UDim2.new(0.75, 0, 0, 20)
         titleLabel.Position = UDim2.new(0.03, 0, 0, 4)
         titleLabel.BackgroundTransparency = 1
         titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        titleLabel.Font = Enum.Font.GothamBold
+        titleLabel.Font = Enum.Font.GothamMedium
         titleLabel.TextSize = 12
         titleLabel.TextXAlignment = Enum.TextXAlignment.Left
         titleLabel.Text = titleText
         titleLabel.Parent = container
 
         local descLabel = Instance.new("TextLabel")
-        descLabel.Size = UDim2.new(0.70, 0, 0, 24)
+        descLabel.Size = UDim2.new(0.75, 0, 0, 18)
         descLabel.Position = UDim2.new(0.03, 0, 0, 22)
         descLabel.BackgroundTransparency = 1
-        descLabel.TextColor3 = Color3.fromRGB(160, 160, 160)
+        descLabel.TextColor3 = Color3.fromRGB(140, 135, 150)
         descLabel.Font = Enum.Font.Gotham
-        descLabel.TextSize = 10
+        descLabel.TextSize = 9
         descLabel.TextXAlignment = Enum.TextXAlignment.Left
-        descLabel.TextWrapped = true
+        descLabel.TextTruncate = Enum.TextTruncate.AtEnd
         descLabel.Text = descText
         descLabel.Parent = container
 
-        local toggleBtn = Instance.new("TextButton")
-        toggleBtn.Size = UDim2.new(0.20, 0, 0, 25)
-        toggleBtn.Position = UDim2.new(0.75, 0, 0.25, 0)
-        toggleBtn.Font = Enum.Font.GothamBold
-        toggleBtn.TextSize = 10
-        toggleBtn.Parent = container
+        -- Switch Esterno dello slider
+        local toggleBg = Instance.new("Frame")
+        toggleBg.Size = UDim2.new(0, 38, 0, 20)
+        toggleBg.Position = UDim2.new(0.95, -38, 0.5, -10)
+        toggleBg.BackgroundColor3 = Color3.fromRGB(35, 30, 45)
+        toggleBg.Parent = container
 
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 4)
-        btnCorner.Parent = toggleBtn
+        local toggleBgCorner = Instance.new("UICorner")
+        toggleBgCorner.CornerRadius = UDim.new(1, 0)
+        toggleBgCorner.Parent = toggleBg
+
+        -- Pallina dello Switch
+        local toggleBall = Instance.new("Frame")
+        toggleBall.Size = UDim2.new(0, 14, 0, 14)
+        toggleBall.Position = UDim2.new(0, 3, 0, 3)
+        toggleBall.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        toggleBall.Parent = toggleBg
+
+        local toggleBallCorner = Instance.new("UICorner")
+        toggleBallCorner.CornerRadius = UDim.new(1, 0)
+        toggleBallCorner.Parent = toggleBall
+
+        local clickBtn = Instance.new("TextButton")
+        clickBtn.Size = UDim2.new(1, 0, 1, 0)
+        clickBtn.BackgroundTransparency = 1
+        clickBtn.Text = ""
+        clickBtn.Parent = container
 
         local state = defaultState
-        local function updateVisual()
-            if state then
-                toggleBtn.Text = "ON"
-                toggleBtn.BackgroundColor3 = Color3.fromRGB(46, 117, 89)
+        local function updateVisual(animate)
+            local targetPos = state and UDim2.new(0, 21, 0, 3) or UDim2.new(0, 3, 0, 3)
+            local targetColor = state and Color3.fromRGB(130, 50, 250) or Color3.fromRGB(35, 30, 45)
+            local ballColor = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
+
+            if animate then
+                TweenService:Create(toggleBg, TweenInfo.new(0.2), {BackgroundColor3 = targetColor}):Play()
+                TweenService:Create(toggleBall, TweenInfo.new(0.2), {Position = targetPos, BackgroundColor3 = ballColor}):Play()
             else
-                toggleBtn.Text = "OFF"
-                toggleBtn.BackgroundColor3 = Color3.fromRGB(117, 46, 46)
+                toggleBg.BackgroundColor3 = targetColor
+                toggleBall.Position = targetPos
+                toggleBall.BackgroundColor3 = ballColor
             end
         end
 
-        updateVisual()
-        toggleBtn.MouseButton1Click:Connect(function()
+        updateVisual(false)
+        clickBtn.MouseButton1Click:Connect(function()
             state = not state
-            updateVisual()
+            updateVisual(true)
             callback(state)
         end)
 
-        return container, toggleBtn
+        return container
     end
 
-    -- Funzione per inserire Dropdown Selettori
+    -- Funzione per inserire Dropdown Selettori (Stile Compatto Minimal Viola)
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
         local dropContainer = Instance.new("Frame")
-        dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
+        dropContainer.Size = UDim2.new(0.98, 0, 0, 32)
         dropContainer.BackgroundTransparency = 1
         dropContainer.Parent = parentTab
 
         local dropBtn = Instance.new("TextButton")
         dropBtn.Size = UDim2.new(1, 0, 1, 0)
-        dropBtn.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
-        dropBtn.TextColor3 = Color3.fromRGB(235, 190, 80)
+        dropBtn.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
+        dropBtn.TextColor3 = Color3.fromRGB(200, 160, 255) -- Testo Viola Soft
         dropBtn.Font = Enum.Font.GothamBold
         dropBtn.TextSize = 11
-        dropBtn.Text = defaultText
+        dropBtn.Text = defaultText .. "  ▼"
         dropBtn.Parent = dropContainer
 
         local dropCorner = Instance.new("UICorner")
         dropCorner.CornerRadius = UDim.new(0, 6)
         dropCorner.Parent = dropBtn
+        
+        local dropStroke = Instance.new("UIStroke")
+        dropStroke.Thickness = 1
+        dropStroke.Color = Color3.fromRGB(45, 35, 60)
+        dropStroke.Parent = dropBtn
 
         local dropListFrame = Instance.new("Frame")
-        dropListFrame.Size = UDim2.new(1, 0, 0, #options * 25)
-        dropListFrame.Position = UDim2.new(0, 0, 1, 2)
-        dropListFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+        dropListFrame.Size = UDim2.new(1, 0, 0, 0)
+        dropListFrame.Position = UDim2.new(0, 0, 1, 3)
+        dropListFrame.BackgroundColor3 = Color3.fromRGB(18, 14, 24)
         dropListFrame.Visible = false
         dropListFrame.ZIndex = 50
         dropListFrame.Parent = dropContainer
+
+        local dropListCorner = Instance.new("UICorner")
+        dropListCorner.CornerRadius = UDim.new(0, 6)
+        dropListCorner.Parent = dropListFrame
 
         local dropLayout = Instance.new("UIListLayout")
         dropLayout.Parent = dropListFrame
 
         for _, val in ipairs(options) do
             local opt = Instance.new("TextButton")
-            opt.Size = UDim2.new(1, 0, 0, 25)
-            opt.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+            opt.Size = UDim2.new(1, 0, 0, 28)
+            opt.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
             opt.TextColor3 = Color3.fromRGB(255, 255, 255)
             opt.Font = Enum.Font.Gotham
             opt.TextSize = 11
@@ -241,23 +325,41 @@ function Library:Inizializza(titoloHub)
             opt.ZIndex = 51
             opt.Parent = dropListFrame
 
+            local optCorner = Instance.new("UICorner")
+            optCorner.CornerRadius = UDim.new(0, 4)
+            optCorner.Parent = opt
+
             opt.Activated:Connect(function()
-                dropBtn.Text = tostring(val.Text or val)
+                dropBtn.Text = tostring(val.Text or val) .. "  ▼"
                 dropListFrame.Visible = false
+                dropContainer.Size = UDim2.new(0.98, 0, 0, 32)
                 callback(val.Value or val)
             end)
         end
-        dropBtn.Activated:Connect(function() dropListFrame.Visible = not dropListFrame.Visible end)
+
+        dropBtn.Activated:Connect(function()
+            dropListFrame.Visible = not dropListFrame.Visible
+            if dropListFrame.Visible then
+                dropListFrame.Size = UDim2.new(1, 0, 0, #options * 28)
+                dropContainer.Size = UDim2.new(0.98, 0, 0, 32 + (#options * 28) + 3)
+            else
+                dropContainer.Size = UDim2.new(0.98, 0, 0, 32)
+            end
+        end)
     end
 
-    -- Forza l'apertura della prima Tab di default
+    -- Forza l'apertura automatica della prima Tab rilevata
     task.spawn(function()
         task.wait(0.1)
-        local primoNome = "Farming"
-        if InterfacciaEngine.tabs[primoNome] then
-            InterfacciaEngine.tabs[primoNome].Visible = true
-            InterfacciaEngine.tabButtons[primoNome].BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-            InterfacciaEngine.tabButtons[primoNome].TextColor3 = Color3.fromRGB(255, 255, 255)
+        for name, frame in pairs(InterfacciaEngine.tabs) do
+            frame.Visible = true
+            local btn = InterfacciaEngine.tabButtons[name]
+            if btn then
+                btn.BackgroundColor3 = Color3.fromRGB(130, 50, 250)
+                btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                btn.UIStroke.Color = Color3.fromRGB(160, 90, 255)
+            end
+            break
         end
     end)
 
