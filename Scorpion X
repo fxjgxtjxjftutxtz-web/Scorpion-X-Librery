@@ -27,7 +27,7 @@ function Library:Inizializza(titoloHub)
     MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
     MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     MainFrame.Active = true
-    MainFrame.Draggable = true -- Si muove e trascina tutto perfettamente
+    MainFrame.Draggable = true
     MainFrame.Visible = true
     MainFrame.Parent = ScreenGui
 
@@ -37,7 +37,7 @@ function Library:Inizializza(titoloHub)
 
     local UIStrokeFrame = Instance.new("UIStroke")
     UIStrokeFrame.Thickness = 1.5
-    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0) -- Verde Acido
+    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0) -- Verde Acido Scorpion
     UIStrokeFrame.Parent = MainFrame
 
     local TopBar = Instance.new("Frame")
@@ -112,7 +112,7 @@ function Library:Inizializza(titoloHub)
         contentFrame.ScrollBarThickness = 3
         contentFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 255, 0)
         contentFrame.Visible = false
-        contentFrame.ClipsDescendants = true -- Taglia gli elementi solo se superano i confini della Tab stessa
+        contentFrame.ClipsDescendants = true
         contentFrame.Parent = ContentContainer
 
         local listLayout = Instance.new("UIListLayout")
@@ -150,7 +150,6 @@ function Library:Inizializza(titoloHub)
         if not self.primaTab then self.primaTab = name end
 
         tabBtn.MouseButton1Click:Connect(function()
-            -- Chiude i dropdown aperti quando cambi Tab per evitare bug visivi
             if self.activeDropdownFrame then
                 self.activeDropdownFrame.Visible = false
                 self.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
@@ -178,7 +177,6 @@ function Library:Inizializza(titoloHub)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 48)
         container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-        container.SortOrder = Enum.SortOrder.LayoutOrder
         container.Parent = parentTab
 
         local corner = Instance.new("UICorner")
@@ -256,16 +254,14 @@ function Library:Inizializza(titoloHub)
     end
 
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
-        -- Il container conterrà sia il bottone che la lista
         local dropContainer = Instance.new("Frame")
-        dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Altezza base chiusa = 35
+        dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Altezza iniziale da chiuso
         dropContainer.BackgroundTransparency = 1
-        dropContainer.ClipsDescendants = true -- Evita che la lista si veda fuori dal container quando è chiusa
-        dropContainer.SortOrder = Enum.SortOrder.LayoutOrder
+        dropContainer.ClipsDescendants = true -- Cruciale: nasconde la lista interna quando rimpicciolito
         dropContainer.Parent = parentTab
 
         local dropBtn = Instance.new("TextButton")
-        dropBtn.Size = UDim2.new(1, 0, 0, 35) -- Altezza fissa del bottone primario
+        dropBtn.Size = UDim2.new(1, 0, 0, 35)
         dropBtn.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
         dropBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
         dropBtn.Font = Enum.Font.SourceSansBold
@@ -283,10 +279,10 @@ function Library:Inizializza(titoloHub)
         dropStroke.Color = Color3.fromRGB(50, 50, 50)
         dropStroke.Parent = dropBtn
 
-        -- LISTA SCROLLABILE INTERNA: Si adatta e spinge i toggle sotto
+        -- SCROLL FRAME INTERNO: Gestisce gli elementi in eccesso e impedisce sovrapposizioni
         local dropListFrame = Instance.new("ScrollingFrame")
         dropListFrame.Name = "DropList"
-        dropListFrame.Size = UDim2.new(1, 0, 0, 0) -- Parte da altezza 0
+        dropListFrame.Size = UDim2.new(1, 0, 0, 0)
         dropListFrame.Position = UDim2.new(0, 0, 0, 38)
         dropListFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
         dropListFrame.Visible = false
@@ -324,7 +320,7 @@ function Library:Inizializza(titoloHub)
                 dropBtn.Text = "  " .. tostring(val.Text or val):upper() .. "  ▼"
                 dropListFrame.Visible = false
                 dropListFrame.Size = UDim2.new(1, 0, 0, 0)
-                dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Rimpicciolisce il contenitore e rialza i toggle
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Riporta i toggle all'altezza standard
                 InterfacciaEngine.activeDropdownFrame = nil
                 InterfacciaEngine.activeDropdownContainer = nil
                 callback(val.Value or val)
@@ -335,11 +331,10 @@ function Library:Inizializza(titoloHub)
             if dropListFrame.Visible then
                 dropListFrame.Visible = false
                 dropListFrame.Size = UDim2.new(1, 0, 0, 0)
-                dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Chiude e resetta lo spazio dei toggle
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
                 InterfacciaEngine.activeDropdownFrame = nil
                 InterfacciaEngine.activeDropdownContainer = nil
             else
-                -- Se c'è un altro dropdown aperto in giro, lo chiude prima di aprire questo
                 if InterfacciaEngine.activeDropdownFrame and InterfacciaEngine.activeDropdownFrame ~= dropListFrame then
                     InterfacciaEngine.activeDropdownFrame.Visible = false
                     InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
@@ -347,12 +342,11 @@ function Library:Inizializza(titoloHub)
                 end
                 
                 dropListFrame.Visible = true
-                -- Scegli l'altezza massima dello scroll frame interno (es. massimo 120px, altrimenti scrolla)
+                -- Se ci sono più di 4 elementi, limita l'altezza a 120px e attiva lo scroll interno
                 local altezzaLista = math.min(#options * 30, 120)
                 
                 dropListFrame.Size = UDim2.new(1, 0, 0, altezzaLista)
-                -- ADATTAMENTO COMPLETO: Allunga il contenitore principale. 
-                -- Il UIListLayout della Tab leggerà questo cambio e sposterà i toggle in basso!
+                -- Modifica le dimensioni totali del container: spinge giù i toggle sottostanti
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35 + altezzaLista + 5)
                 
                 InterfacciaEngine.activeDropdownFrame = dropListFrame
