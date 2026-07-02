@@ -1,16 +1,14 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (CORRETTA E COMPLETA)
+-- SCORPION X - UI LIBRARY ENGINE (STABLE MOBILE FIX)
 -- =============================================================================
 local Library = {}
 
 function Library:Inizializza(titoloHub)
     local Players = game:GetService("Players")
     local CoreGui = game:GetService("CoreGui")
-    local TweenService = game:GetService("TweenService")
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
 
-    -- Rimuove vecchie istanze
     local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
     if oldGui then oldGui:Destroy() end
 
@@ -22,15 +20,15 @@ function Library:Inizializza(titoloHub)
     local successo = pcall(function() ScreenGui.Parent = CoreGui end)
     if not successo then ScreenGui.Parent = playerGui end
 
-    -- Finestra Principale
+    -- Finestra Principale - Forzata Visibile e Attiva
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Size = UDim2.new(0, 520, 0, 340)
     MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
     MainFrame.BackgroundColor3 = Color3.fromRGB(15, 13, 20)
-    MainFrame.Visible = true
     MainFrame.Active = true
     MainFrame.Draggable = true
+    MainFrame.Visible = true
     MainFrame.Parent = ScreenGui
 
     local UICornerFrame = Instance.new("UICorner")
@@ -84,11 +82,11 @@ function Library:Inizializza(titoloHub)
         MainFrame.Visible = not MainFrame.Visible
     end)
 
-    -- Barra Laterale per i Bottoni delle Tab
+    -- FIX: Dimensioni assolute fisse per la barra laterale
     local SideBar = Instance.new("ScrollingFrame")
     SideBar.Name = "SideBar"
-    SideBar.Size = UDim2.new(0, 130, 1, -45)
-    SideBar.Position = UDim2.new(0, 10, 0, 40)
+    SideBar.Size = UDim2.new(0, 130, 0, 285)
+    SideBar.Position = UDim2.new(0, 10, 0, 45)
     SideBar.BackgroundTransparency = 1
     SideBar.CanvasSize = UDim2.new(0, 0, 0, 0)
     SideBar.AutomaticCanvasSize = Enum.AutomaticCanvasSize.Y
@@ -100,11 +98,11 @@ function Library:Inizializza(titoloHub)
     SideBarList.SortOrder = Enum.SortOrder.LayoutOrder
     SideBarList.Parent = SideBar
 
-    -- Contenitore delle Pagine
+    -- FIX: Dimensioni assolute fisse per il contenitore delle schede
     local ContentContainer = Instance.new("Frame")
     ContentContainer.Name = "ContentContainer"
-    ContentContainer.Size = UDim2.new(1, -160, 1, -45)
-    ContentContainer.Position = UDim2.new(0, 150, 0, 40)
+    ContentContainer.Size = UDim2.new(0, 360, 0, 285)
+    ContentContainer.Position = UDim2.new(0, 150, 0, 45)
     ContentContainer.BackgroundTransparency = 1
     ContentContainer.Parent = MainFrame
 
@@ -130,7 +128,7 @@ function Library:Inizializza(titoloHub)
         self.tabs[name] = contentFrame
 
         local tabBtn = Instance.new("TextButton")
-        tabBtn.Size = UDim2.new(1, 0, 0, 32)
+        tabBtn.Size = UDim2.new(0, 120, 0, 32)
         tabBtn.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
         tabBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
         tabBtn.Font = Enum.Font.GothamSemibold
@@ -176,7 +174,7 @@ function Library:Inizializza(titoloHub)
 
     function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
         local container = Instance.new("Frame")
-        container.Size = UDim2.new(0.96, 0, 0, 45)
+        container.Size = UDim2.new(0.95, 0, 0, 45)
         container.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
         container.Parent = parentTab
 
@@ -213,7 +211,7 @@ function Library:Inizializza(titoloHub)
 
         local toggleBg = Instance.new("Frame")
         toggleBg.Size = UDim2.new(0, 38, 0, 20)
-        toggleBg.Position = UDim2.new(0.95, -40, 0.5, -10)
+        toggleBg.Position = UDim2.new(1, -50, 0.5, -10)
         toggleBg.BackgroundColor3 = Color3.fromRGB(35, 30, 45)
         toggleBg.Parent = container
 
@@ -256,7 +254,7 @@ function Library:Inizializza(titoloHub)
 
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
         local dropContainer = Instance.new("Frame")
-        dropContainer.Size = UDim2.new(0.96, 0, 0, 32)
+        dropContainer.Size = UDim2.new(0.95, 0, 0, 32)
         dropContainer.BackgroundTransparency = 1
         dropContainer.Parent = parentTab
 
@@ -298,7 +296,7 @@ function Library:Inizializza(titoloHub)
             opt.Activated:Connect(function()
                 dropBtn.Text = tostring(val.Text or val) .. "  ▼"
                 dropListFrame.Visible = false
-                dropContainer.Size = UDim2.new(0.96, 0, 0, 32)
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 32)
                 callback(val.Value or val)
             end)
         end
@@ -307,17 +305,17 @@ function Library:Inizializza(titoloHub)
             dropListFrame.Visible = not dropListFrame.Visible
             if dropListFrame.Visible then
                 dropListFrame.Size = UDim2.new(1, 0, 0, #options * 28)
-                dropContainer.Size = UDim2.new(0.96, 0, 0, 32 + (#options * 28) + 3)
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 32 + (#options * 28) + 3)
             else
-                dropContainer.Size = UDim2.new(0.96, 0, 0, 32)
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 32)
             end
         end)
     end
 
-    -- Attiva e mostra in automatico la prima scheda generata
+    -- Forza il disegno iniziale
     task.spawn(function()
-        task.wait(0.3)
-        if self.primaTab then
+        task.wait(0.5)
+        if self.primaTab and self.tabs[self.primaTab] then
             self.tabs[self.primaTab].Visible = true
             local btn = self.tabButtons[self.primaTab]
             if btn then
