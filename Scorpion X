@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (UNIVERSAL MOBILE COMPATIBLE)
+-- SCORPION X - UI LIBRARY ENGINE (FIXED GLITCH & ACID GREEN EDITION)
 -- =============================================================================
 local Library = {}
 
@@ -20,11 +20,12 @@ function Library:Inizializza(titoloHub)
     local successo = pcall(function() ScreenGui.Parent = CoreGui end)
     if not successo then ScreenGui.Parent = playerGui end
 
+    -- MAIN FRAME: Sfondo Nero/Grigio Scuro
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Size = UDim2.new(0, 520, 0, 340)
     MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 13, 20)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Nero profondo
     MainFrame.Active = true
     MainFrame.Draggable = true
     MainFrame.Visible = true
@@ -34,15 +35,16 @@ function Library:Inizializza(titoloHub)
     UICornerFrame.CornerRadius = UDim.new(0, 10)
     UICornerFrame.Parent = MainFrame
 
+    -- BORDUURA: Verde Acido
     local UIStrokeFrame = Instance.new("UIStroke")
     UIStrokeFrame.Thickness = 1.5
-    UIStrokeFrame.Color = Color3.fromRGB(130, 50, 250)
+    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0) -- Verde Acido
     UIStrokeFrame.Parent = MainFrame
 
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Size = UDim2.new(1, 0, 0, 35)
-    TopBar.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
+    TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25) -- Grigio Scuro
     TopBar.Parent = MainFrame
 
     local TopBarCorner = Instance.new("UICorner")
@@ -53,19 +55,20 @@ function Library:Inizializza(titoloHub)
     TitleLabel.Size = UDim2.new(1, -20, 1, 0)
     TitleLabel.Position = UDim2.new(0, 15, 0, 0)
     TitleLabel.BackgroundTransparency = 1
-    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- Bianco
     TitleLabel.Font = Enum.Font.GothamBold
     TitleLabel.TextSize = 14
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Text = tostring(titoloHub):upper()
     TitleLabel.Parent = TopBar
 
+    -- BOTTONE DI APERTURA (SCO X)
     local ToggleMenuBtn = Instance.new("TextButton")
     ToggleMenuBtn.Name = "ToggleMenuBtn"
     ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
     ToggleMenuBtn.Position = UDim2.new(0, 20, 0.3, 0)
-    ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(130, 50, 250)
-    ToggleMenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(150, 255, 0) -- Verde Acido
+    ToggleMenuBtn.TextColor3 = Color3.fromRGB(0, 0, 0) -- Testo Nero per contrasto
     ToggleMenuBtn.Font = Enum.Font.GothamBold
     ToggleMenuBtn.TextSize = 12
     ToggleMenuBtn.Text = "SCO X"
@@ -79,7 +82,6 @@ function Library:Inizializza(titoloHub)
         MainFrame.Visible = not MainFrame.Visible
     end)
 
-    -- Rimosso AutomaticCanvasSize, usiamo altezza manuale fissa espandibile
     local SideBar = Instance.new("ScrollingFrame")
     SideBar.Name = "SideBar"
     SideBar.Size = UDim2.new(0, 130, 0, 285)
@@ -108,9 +110,9 @@ function Library:Inizializza(titoloHub)
         contentFrame.Name = name .. "Tab"
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
         contentFrame.BackgroundTransparency = 1
-        contentFrame.CanvasSize = UDim2.new(0, 0, 0, 500) -- Canvas abbondante per contenere i toggle
+        contentFrame.CanvasSize = UDim2.new(0, 0, 0, 500)
         contentFrame.ScrollBarThickness = 4
-        contentFrame.ScrollBarImageColor3 = Color3.fromRGB(130, 50, 250)
+        contentFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 255, 0) -- Sbarra Verde Acido
         contentFrame.Visible = false
         contentFrame.Parent = ContentContainer
 
@@ -120,7 +122,6 @@ function Library:Inizializza(titoloHub)
         listLayout.SortOrder = Enum.SortOrder.LayoutOrder
         listLayout.Parent = contentFrame
 
-        -- Funzione interna per aggiornare dinamicamente lo spazio di scorrimento senza crash
         listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
             contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 20)
         end)
@@ -129,8 +130,8 @@ function Library:Inizializza(titoloHub)
 
         local tabBtn = Instance.new("TextButton")
         tabBtn.Size = UDim2.new(0, 120, 0, 32)
-        tabBtn.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
-        tabBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25) -- Grigio Scuro
+        tabBtn.TextColor3 = Color3.fromRGB(180, 180, 180) -- Grigio Chiaro
         tabBtn.Font = Enum.Font.GothamSemibold
         tabBtn.TextSize = 12
         tabBtn.Text = " " .. name
@@ -144,7 +145,7 @@ function Library:Inizializza(titoloHub)
         
         local btnStroke = Instance.new("UIStroke")
         btnStroke.Thickness = 1
-        btnStroke.Color = Color3.fromRGB(35, 30, 50)
+        btnStroke.Color = Color3.fromRGB(40, 40, 40)
         btnStroke.Parent = tabBtn
 
         if not self.primaTab then
@@ -157,13 +158,13 @@ function Library:Inizializza(titoloHub)
             end
             for bName, btn in pairs(self.tabButtons) do
                 if bName == name then
-                    btn.BackgroundColor3 = Color3.fromRGB(130, 50, 250)
-                    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    btn.UIStroke.Color = Color3.fromRGB(160, 90, 255)
+                    btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0) -- Attivo: Verde Acido
+                    btn.TextColor3 = Color3.fromRGB(0, 0, 0) -- Attivo: Nero
+                    btn.UIStroke.Color = Color3.fromRGB(200, 255, 100)
                 else
-                    btn.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
-                    btn.TextColor3 = Color3.fromRGB(180, 180, 200)
-                    btn.UIStroke.Color = Color3.fromRGB(35, 30, 50)
+                    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25) -- Spento: Grigio
+                    btn.TextColor3 = Color3.fromRGB(180, 180, 180) -- Spento: Grigio chiaro
+                    btn.UIStroke.Color = Color3.fromRGB(40, 40, 40)
                 end
             end
         end)
@@ -175,7 +176,7 @@ function Library:Inizializza(titoloHub)
     function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 48)
-        container.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
+        container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
         container.Parent = parentTab
 
         local corner = Instance.new("UICorner")
@@ -184,14 +185,14 @@ function Library:Inizializza(titoloHub)
         
         local stroke = Instance.new("UIStroke")
         stroke.Thickness = 1
-        stroke.Color = Color3.fromRGB(35, 30, 50)
+        stroke.Color = Color3.fromRGB(40, 40, 40)
         stroke.Parent = container
 
         local titleLabel = Instance.new("TextLabel")
         titleLabel.Size = UDim2.new(0.7, 0, 0, 20)
         titleLabel.Position = UDim2.new(0, 10, 0, 5)
         titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- Bianco
         titleLabel.Font = Enum.Font.GothamMedium
         titleLabel.TextSize = 13
         titleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -202,7 +203,7 @@ function Library:Inizializza(titoloHub)
         descLabel.Size = UDim2.new(0.7, 0, 0, 18)
         descLabel.Position = UDim2.new(0, 10, 0, 23)
         descLabel.BackgroundTransparency = 1
-        descLabel.TextColor3 = Color3.fromRGB(140, 135, 150)
+        descLabel.TextColor3 = Color3.fromRGB(150, 150, 150) -- Grigio
         descLabel.Font = Enum.Font.Gotham
         descLabel.TextSize = 10
         descLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -212,7 +213,7 @@ function Library:Inizializza(titoloHub)
         local toggleBg = Instance.new("Frame")
         toggleBg.Size = UDim2.new(0, 42, 0, 22)
         toggleBg.Position = UDim2.new(1, -52, 0.5, -11)
-        toggleBg.BackgroundColor3 = Color3.fromRGB(35, 30, 45)
+        toggleBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         toggleBg.Parent = container
 
         local toggleBgCorner = Instance.new("UICorner")
@@ -222,7 +223,7 @@ function Library:Inizializza(titoloHub)
         local toggleBall = Instance.new("Frame")
         toggleBall.Size = UDim2.new(0, 16, 0, 16)
         toggleBall.Position = UDim2.new(0, 3, 0, 3)
-        toggleBall.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+        toggleBall.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         toggleBall.Parent = toggleBg
 
         local toggleBallCorner = Instance.new("UICorner")
@@ -237,9 +238,10 @@ function Library:Inizializza(titoloHub)
 
         local state = defaultState
         local function updateVisual()
-            toggleBg.BackgroundColor3 = state and Color3.fromRGB(130, 50, 250) or Color3.fromRGB(35, 30, 45)
+            -- Attivo: Sfondo Verde Acido, Pallina Bianca | Spento: Grigio/Nero
+            toggleBg.BackgroundColor3 = state and Color3.fromRGB(150, 255, 0) or Color3.fromRGB(40, 40, 40)
             toggleBall.Position = state and UDim2.new(0, 23, 0, 3) or UDim2.new(0, 3, 0, 3)
-            toggleBall.BackgroundColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150)
+            toggleBall.BackgroundColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(120, 120, 120)
         end
 
         updateVisual()
@@ -253,19 +255,22 @@ function Library:Inizializza(titoloHub)
     end
 
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
+        -- Usiamo ClipsDescendants = false sul container per permettere alla lista di uscire senza glitchare
         local dropContainer = Instance.new("Frame")
         dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
         dropContainer.BackgroundTransparency = 1
+        dropContainer.ClipsDescendants = false 
         dropContainer.Parent = parentTab
 
         local dropBtn = Instance.new("TextButton")
         dropBtn.Size = UDim2.new(1, 0, 1, 0)
-        dropBtn.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
-        dropBtn.TextColor3 = Color3.fromRGB(200, 160, 255)
+        dropBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        dropBtn.TextColor3 = Color3.fromRGB(150, 255, 0) -- Testo Verde Acido
         dropBtn.Font = Enum.Font.GothamBold
         dropBtn.TextSize = 12
         dropBtn.Text = "  " .. defaultText .. "  ▼"
         dropBtn.TextXAlignment = Enum.TextXAlignment.Left
+        dropBtn.ZIndex = 10 -- Alza il bottone primario
         dropBtn.Parent = dropContainer
 
         local dropCorner = Instance.new("UICorner")
@@ -274,15 +279,15 @@ function Library:Inizializza(titoloHub)
         
         local dropStroke = Instance.new("UIStroke")
         dropStroke.Thickness = 1
-        dropStroke.Color = Color3.fromRGB(35, 30, 50)
+        dropStroke.Color = Color3.fromRGB(150, 255, 0) -- Bordo Verde Acido
         dropStroke.Parent = dropBtn
 
         local dropListFrame = Instance.new("Frame")
         dropListFrame.Size = UDim2.new(1, 0, 0, 0)
         dropListFrame.Position = UDim2.new(0, 0, 1, 3)
-        dropListFrame.BackgroundColor3 = Color3.fromRGB(18, 14, 24)
+        dropListFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Sfondo nero lista
         dropListFrame.Visible = false
-        dropListFrame.ZIndex = 50
+        dropListFrame.ZIndex = 50 -- Valore alto per sovrapporsi ai toggle sottostanti (Risolve il Glitch!)
         dropListFrame.Parent = dropContainer
         
         local dCorner = Instance.new("UICorner")
@@ -295,13 +300,13 @@ function Library:Inizializza(titoloHub)
         for _, val in ipairs(options) do
             local opt = Instance.new("TextButton")
             opt.Size = UDim2.new(1, 0, 0, 30)
-            opt.BackgroundColor3 = Color3.fromRGB(25, 20, 35)
-            opt.TextColor3 = Color3.fromRGB(255, 255, 255)
+            opt.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Elementi grigi
+            opt.TextColor3 = Color3.fromRGB(255, 255, 255) -- Scritta bianca
             opt.Font = Enum.Font.Gotham
             opt.TextSize = 11
             opt.Text = "   " .. tostring(val.Text or val)
             opt.TextXAlignment = Enum.TextXAlignment.Left
-            opt.ZIndex = 51
+            opt.ZIndex = 51 -- Sopra il frame della lista
             opt.Parent = dropListFrame
 
             opt.Activated:Connect(function()
@@ -316,6 +321,7 @@ function Library:Inizializza(titoloHub)
             dropListFrame.Visible = not dropListFrame.Visible
             if dropListFrame.Visible then
                 dropListFrame.Size = UDim2.new(1, 0, 0, #options * 30)
+                -- Modifica della dimensione del container per non rompere il layout UIListLayout del tab padre
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35 + (#options * 30) + 5)
             else
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
@@ -329,9 +335,9 @@ function Library:Inizializza(titoloHub)
             self.tabs[self.primaTab].Visible = true
             local btn = self.tabButtons[self.primaTab]
             if btn then
-                btn.BackgroundColor3 = Color3.fromRGB(130, 50, 250)
-                btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                btn.UIStroke.Color = Color3.fromRGB(160, 90, 255)
+                btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
+                btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+                btn.UIStroke.Color = Color3.fromRGB(200, 255, 100)
             end
         end
     end)
