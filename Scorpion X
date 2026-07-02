@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (REDZ HUB STYLE)
+-- SCORPION X - UI LIBRARY ENGINE (STANDALONE)
 -- =============================================================================
 local Library = {}
 
@@ -10,7 +10,7 @@ function Library:Inizializza(titoloHub)
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
 
-    -- Pulizia istanze precedenti
+    -- Pulizia istanze precedenti per evitare sovrapposizioni
     local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
     if oldGui then oldGui:Destroy() end
 
@@ -28,7 +28,7 @@ function Library:Inizializza(titoloHub)
     MainFrame.Size = UDim2.new(0, 520, 0, 340)
     MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
     MainFrame.BackgroundColor3 = Color3.fromRGB(15, 13, 20)
-    MainFrame.Visible = true -- Impostato a true di default per vedere subito se carica
+    MainFrame.Visible = true
     MainFrame.Active = true
     MainFrame.Draggable = true
     MainFrame.Parent = ScreenGui
@@ -72,7 +72,7 @@ function Library:Inizializza(titoloHub)
     TitleLabel.Text = "SCORPION X | " .. tostring(titoloHub):upper()
     TitleLabel.Parent = TopBar
 
-    -- Bottone di attivazione mobile/desktop (Floating Purple Button)
+    -- Bottone Fluttuante di attivazione menu
     local ToggleMenuBtn = Instance.new("TextButton")
     ToggleMenuBtn.Name = "ToggleMenuBtn"
     ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
@@ -113,7 +113,7 @@ function Library:Inizializza(titoloHub)
     SideBarList.SortOrder = Enum.SortOrder.LayoutOrder
     SideBarList.Parent = SideBar
 
-    -- Contenitore Principale Elementi
+    -- Contenitore Principale Elementi UI
     local ContentContainer = Instance.new("Frame")
     ContentContainer.Size = UDim2.new(1, -155, 1, -45)
     ContentContainer.Position = UDim2.new(0, 150, 0, 40)
@@ -340,8 +340,9 @@ function Library:Inizializza(titoloHub)
         end)
     end
 
+    -- Forza l'apertura grafica visiva immediata all'inizializzazione
     task.spawn(function()
-        task.wait(0.1)
+        task.wait(0.2)
         for name, frame in pairs(InterfacciaEngine.tabs) do
             frame.Visible = true
             local btn = InterfacciaEngine.tabButtons[name]
