@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (FIXED COMPONENTS)
+-- SCORPION X - UI LIBRARY ENGINE (UNIVERSAL MOBILE COMPATIBLE)
 -- =============================================================================
 local Library = {}
 
@@ -79,13 +79,13 @@ function Library:Inizializza(titoloHub)
         MainFrame.Visible = not MainFrame.Visible
     end)
 
+    -- Rimosso AutomaticCanvasSize, usiamo altezza manuale fissa espandibile
     local SideBar = Instance.new("ScrollingFrame")
     SideBar.Name = "SideBar"
     SideBar.Size = UDim2.new(0, 130, 0, 285)
     SideBar.Position = UDim2.new(0, 10, 0, 45)
     SideBar.BackgroundTransparency = 1
-    SideBar.CanvasSize = UDim2.new(0, 0, 0, 0)
-    SideBar.AutomaticCanvasSize = Enum.AutomaticCanvasSize.Y
+    SideBar.CanvasSize = UDim2.new(0, 0, 0, 400)
     SideBar.ScrollBarThickness = 0
     SideBar.Parent = MainFrame
 
@@ -108,8 +108,7 @@ function Library:Inizializza(titoloHub)
         contentFrame.Name = name .. "Tab"
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
         contentFrame.BackgroundTransparency = 1
-        contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-        contentFrame.AutomaticCanvasSize = Enum.AutomaticCanvasSize.Y
+        contentFrame.CanvasSize = UDim2.new(0, 0, 0, 500) -- Canvas abbondante per contenere i toggle
         contentFrame.ScrollBarThickness = 4
         contentFrame.ScrollBarImageColor3 = Color3.fromRGB(130, 50, 250)
         contentFrame.Visible = false
@@ -120,6 +119,11 @@ function Library:Inizializza(titoloHub)
         listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
         listLayout.SortOrder = Enum.SortOrder.LayoutOrder
         listLayout.Parent = contentFrame
+
+        -- Funzione interna per aggiornare dinamicamente lo spazio di scorrimento senza crash
+        listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 20)
+        end)
 
         self.tabs[name] = contentFrame
 
@@ -320,7 +324,7 @@ function Library:Inizializza(titoloHub)
     end
 
     task.spawn(function()
-        task.wait(0.6)
+        task.wait(0.5)
         if self.primaTab and self.tabs[self.primaTab] then
             self.tabs[self.primaTab].Visible = true
             local btn = self.tabButtons[self.primaTab]
