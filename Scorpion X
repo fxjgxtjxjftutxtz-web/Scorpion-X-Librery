@@ -1,0 +1,106 @@
+-- =============================================================================
+-- AERO AUTOMATION - LIBRERIA GUI ESTRATTA
+-- =============================================================================
+local Library = {}
+
+function Library:Inizializza(titoloHub)
+    local Players = game:GetService("Players")
+    local CoreGui = game:GetService("CoreGui")
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
+
+    local oldGui = playerGui:FindFirstChild("AeroAutoFarmMenu") or CoreGui:FindFirstChild("AeroAutoFarmMenu")
+    if oldGui then oldGui:Destroy() end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "AeroAutoFarmMenu"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.DisplayOrder = 100
+
+    local successo = pcall(function() ScreenGui.Parent = CoreGui end)
+    if not successo then ScreenGui.Parent = playerGui end
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0.4, 0, 0.6, 0)
+    MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 14)
+    MainFrame.Visible = false
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+
+    local ToggleMenuBtn = Instance.new("TextButton")
+    ToggleMenuBtn.Size = UDim2.new(0, 180, 0, 45)
+    ToggleMenuBtn.Position = UDim2.new(0, 20, 0.45, 0)
+    ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    ToggleMenuBtn.TextColor3 = Color3.fromRGB(240, 240, 240)
+    ToggleMenuBtn.Font = Enum.Font.GothamBold
+    ToggleMenuBtn.Text = "APRI " .. titoloHub:upper()
+    ToggleMenuBtn.Parent = ScreenGui
+
+    ToggleMenuBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = not MainFrame.Visible
+        ToggleMenuBtn.Text = MainFrame.Visible and "CHIUDI HUB" or "APRI " .. titoloHub:upper()
+    end)
+
+    local ContentContainer = Instance.new("ScrollingFrame")
+    ContentContainer.Size = UDim2.new(0.9, 0, 0.8, 0)
+    ContentContainer.Position = UDim2.new(0.05, 0, 0.15, 0)
+    ContentContainer.BackgroundTransparency = 1
+    ContentContainer.CanvasSize = UDim2.new(0, 0, 2, 0)
+    ContentContainer.ScrollBarThickness = 3
+    ContentContainer.Parent = MainFrame
+
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.Padding = UDim.new(0.02, 0)
+    listLayout.Parent = ContentContainer
+
+    local Interfaccia = {}
+
+    function Interfaccia:AggiungiToggle(testo, descrizione, statoIniziale, callback)
+        local container = Instance.new("Frame")
+        container.Size = UDim2.new(0.95, 0, 0, 50)
+        container.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+        container.Parent = ContentContainer
+
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(0.70, 0, 0, 20)
+        titleLabel.Position = UDim2.new(0.03, 0, 0, 4)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        titleLabel.Font = Enum.Font.GothamBold
+        titleLabel.TextSize = 12
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.Text = testo
+        titleLabel.Parent = container
+
+        local toggleBtn = Instance.new("TextButton")
+        toggleBtn.Size = UDim2.new(0.20, 0, 0, 25)
+        toggleBtn.Position = UDim2.new(0.75, 0, 0.25, 0)
+        toggleBtn.Font = Enum.Font.GothamBold
+        toggleBtn.Parent = container
+
+        local stato = statoIniziale
+        local function aggiorna()
+            if stato then
+                toggleBtn.Text = "ON"
+                toggleBtn.BackgroundColor3 = Color3.fromRGB(46, 117, 89)
+            else
+                toggleBtn.Text = "OFF"
+                toggleBtn.BackgroundColor3 = Color3.fromRGB(117, 46, 46)
+            end
+        end
+
+        aggiorna()
+        toggleBtn.MouseButton1Click:Connect(function()
+            stato = not stato
+            aggiorna()
+            callback(stato)
+        end)
+    end
+
+    return Interfaccia
+end
+
+return Library
