@@ -81,12 +81,12 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
     UIStrokeBtn.Color = Color3.fromRGB(150, 255, 0)
     UIStrokeBtn.Parent = ToggleMenuBtn
 
-    -- Gestione dinamica dell'icona (Fix per evitare l'errore ImagePadding)
+    -- Gestione dinamica dell'icona (Fix definitivo per evitare l'errore ImagePadding)
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
         local IconLabel = Instance.new("ImageLabel")
         IconLabel.Name = "IconLabel"
-        -- Ridotto leggermente per creare l'effetto padding/bordo interno in modo sicuro
+        -- Ridotto leggermente (bordo interno di 6px per lato) per fare l'effetto padding in modo nativo e sicuro
         IconLabel.Size = UDim2.new(1, -12, 1, -12)
         IconLabel.Position = UDim2.new(0, 6, 0, 6)
         IconLabel.BackgroundTransparency = 1
