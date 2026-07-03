@@ -1,9 +1,9 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (DYNAMIC LAYOUT ADAPTATION - NO OVERLAP)
+-- SCORPION X - UI LIBRARY ENGINE (DRAGGABLE TOGGLE BUTTON & ICON SUPPORT)
 -- =============================================================================
 local Library = {}
 
-function Library:Inizializza(titoloHub)
+function Library:Inizializza(titoloHub, idIconaPulsante)
     local Players = game:GetService("Players")
     local CoreGui = game:GetService("CoreGui")
     local player = Players.LocalPlayer
@@ -20,14 +20,14 @@ function Library:Inizializza(titoloHub)
     local successo = pcall(function() ScreenGui.Parent = CoreGui end)
     if not successo then ScreenGui.Parent = playerGui end
 
-    -- MAIN FRAME
+    -- MAIN FRAME (IL MENU)
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Size = UDim2.new(0, 520, 0, 340)
     MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
     MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     MainFrame.Active = true
-    MainFrame.Draggable = true
+    MainFrame.Draggable = true 
     MainFrame.Visible = true
     MainFrame.Parent = ScreenGui
 
@@ -37,7 +37,7 @@ function Library:Inizializza(titoloHub)
 
     local UIStrokeFrame = Instance.new("UIStroke")
     UIStrokeFrame.Thickness = 1.5
-    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0) -- Verde Acido Scorpion
+    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0)
     UIStrokeFrame.Parent = MainFrame
 
     local TopBar = Instance.new("Frame")
@@ -61,20 +61,41 @@ function Library:Inizializza(titoloHub)
     TitleLabel.Text = tostring(titoloHub):upper()
     TitleLabel.Parent = TopBar
 
-    local ToggleMenuBtn = Instance.new("TextButton")
+    -- PULSANTE APERTURA/CHIUSURA COMPLETAMENTE TRASCINABILE CON SUPPORTO ICONE
+    local ToggleMenuBtn = Instance.new("ImageButton")
     ToggleMenuBtn.Name = "ToggleMenuBtn"
     ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
     ToggleMenuBtn.Position = UDim2.new(0, 20, 0.3, 0)
-    ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
-    ToggleMenuBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-    ToggleMenuBtn.Font = Enum.Font.SourceSansBold
-    ToggleMenuBtn.TextSize = 14
-    ToggleMenuBtn.Text = "SCO X"
+    ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    ToggleMenuBtn.Active = true
+    ToggleMenuBtn.Draggable = true -- Ora puoi muoverlo indipendentemente dal menu!
     ToggleMenuBtn.Parent = ScreenGui
+
+    -- Controllo e rendering nativo dell'ID Immagine di Roblox
+    if idIconaPulsante and idIconaPulsante ~= "" then
+        local pulitoID = tostring(idIconaPulsante):match("%d+")
+        ToggleMenuBtn.Image = "rbxassetid://" .. pulitoID
+        ToggleMenuBtn.ScaleType = Enum.ScaleType.Fit
+        ToggleMenuBtn.ImagePadding = UDim2.new(0, 5, 0, 5)
+    else
+        local fallbackText = Instance.new("TextLabel")
+        fallbackText.Size = UDim2.new(1, 0, 1, 0)
+        fallbackText.BackgroundTransparency = 1
+        fallbackText.TextColor3 = Color3.fromRGB(150, 255, 0)
+        fallbackText.Font = Enum.Font.SourceSansBold
+        fallbackText.TextSize = 14
+        fallbackText.Text = "SCO X"
+        fallbackText.Parent = ToggleMenuBtn
+    end
 
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(1, 0)
     UICornerBtn.Parent = ToggleMenuBtn
+
+    local UIStrokeBtn = Instance.new("UIStroke")
+    UIStrokeBtn.Thickness = 1.5
+    UIStrokeBtn.Color = Color3.fromRGB(150, 255, 0)
+    UIStrokeBtn.Parent = ToggleMenuBtn
 
     ToggleMenuBtn.MouseButton1Click:Connect(function()
         MainFrame.Visible = not MainFrame.Visible
@@ -255,9 +276,9 @@ function Library:Inizializza(titoloHub)
 
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
         local dropContainer = Instance.new("Frame")
-        dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Altezza iniziale da chiuso
+        dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
         dropContainer.BackgroundTransparency = 1
-        dropContainer.ClipsDescendants = true -- Cruciale: nasconde la lista interna quando rimpicciolito
+        dropContainer.ClipsDescendants = true
         dropContainer.Parent = parentTab
 
         local dropBtn = Instance.new("TextButton")
@@ -279,7 +300,6 @@ function Library:Inizializza(titoloHub)
         dropStroke.Color = Color3.fromRGB(50, 50, 50)
         dropStroke.Parent = dropBtn
 
-        -- SCROLL FRAME INTERNO: Gestisce gli elementi in eccesso e impedisce sovrapposizioni
         local dropListFrame = Instance.new("ScrollingFrame")
         dropListFrame.Name = "DropList"
         dropListFrame.Size = UDim2.new(1, 0, 0, 0)
@@ -320,7 +340,7 @@ function Library:Inizializza(titoloHub)
                 dropBtn.Text = "  " .. tostring(val.Text or val):upper() .. "  ▼"
                 dropListFrame.Visible = false
                 dropListFrame.Size = UDim2.new(1, 0, 0, 0)
-                dropContainer.Size = UDim2.new(0.95, 0, 0, 35) -- Riporta i toggle all'altezza standard
+                dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
                 InterfacciaEngine.activeDropdownFrame = nil
                 InterfacciaEngine.activeDropdownContainer = nil
                 callback(val.Value or val)
@@ -342,11 +362,8 @@ function Library:Inizializza(titoloHub)
                 end
                 
                 dropListFrame.Visible = true
-                -- Se ci sono più di 4 elementi, limita l'altezza a 120px e attiva lo scroll interno
                 local altezzaLista = math.min(#options * 30, 120)
-                
                 dropListFrame.Size = UDim2.new(1, 0, 0, altezzaLista)
-                -- Modifica le dimensioni totali del container: spinge giù i toggle sottostanti
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35 + altezzaLista + 5)
                 
                 InterfacciaEngine.activeDropdownFrame = dropListFrame
