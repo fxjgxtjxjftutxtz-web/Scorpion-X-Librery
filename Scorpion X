@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (DRAGGABLE TOGGLE BUTTON & ICON SUPPORT) - FIXED
+-- SCORPION X - UI LIBRARY ENGINE (FULL SCREEN ICON FIX)
 -- =============================================================================
 local Library = {}
 
@@ -61,13 +61,14 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
     TitleLabel.Text = tostring(titoloHub):upper()
     TitleLabel.Parent = TopBar
 
-    -- PULSANTE APERTURA/CHIUSURA TRASCINABILE (TextButton come base per stabilità)
+    -- PULSANTE APERTURA/CHIUSURA TRASCINABILE
     local ToggleMenuBtn = Instance.new("TextButton")
     ToggleMenuBtn.Name = "ToggleMenuBtn"
     ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
     ToggleMenuBtn.Position = UDim2.new(0, 20, 0.3, 0)
     ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     ToggleMenuBtn.Text = ""
+    ToggleMenuBtn.ClipsDescendants = true -- Taglia l'immagine se esce dai bordi arrotondati
     ToggleMenuBtn.Active = true
     ToggleMenuBtn.Draggable = true 
     ToggleMenuBtn.Parent = ScreenGui
@@ -81,18 +82,22 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
     UIStrokeBtn.Color = Color3.fromRGB(150, 255, 0)
     UIStrokeBtn.Parent = ToggleMenuBtn
 
-    -- Gestione dinamica dell'icona (Fix definitivo per evitare l'errore ImagePadding)
+    -- Gestione dell'icona a dimensione intera (100% del pulsante)
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
         local IconLabel = Instance.new("ImageLabel")
         IconLabel.Name = "IconLabel"
-        -- Ridotto leggermente (bordo interno di 6px per lato) per fare l'effetto padding in modo nativo e sicuro
-        IconLabel.Size = UDim2.new(1, -12, 1, -12)
-        IconLabel.Position = UDim2.new(0, 6, 0, 6)
+        IconLabel.Size = UDim2.new(1, 0, 1, 0) -- Occupa il 100% in larghezza e altezza
+        IconLabel.Position = UDim2.new(0, 0, 0, 0) -- Centrato perfettamente a zero
         IconLabel.BackgroundTransparency = 1
         IconLabel.Image = "rbxassetid://" .. pulitoID
-        IconLabel.ScaleType = Enum.ScaleType.Fit
+        IconLabel.ScaleType = Enum.ScaleType.Crop -- Riempie tutto lo spazio adattandosi
         IconLabel.Parent = ToggleMenuBtn
+        
+        -- Arrotonda anche l'immagine interna per non farla uscire dal cerchio
+        local IconCorner = Instance.new("UICorner")
+        IconCorner.CornerRadius = UDim.new(1, 0)
+        IconCorner.Parent = IconLabel
     else
         local fallbackText = Instance.new("TextLabel")
         fallbackText.Size = UDim2.new(1, 0, 1, 0)
