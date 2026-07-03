@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (DRAGGABLE TOGGLE BUTTON & ICON SUPPORT)
+-- SCORPION X - UI LIBRARY ENGINE (DRAGGABLE TOGGLE BUTTON & ICON SUPPORT) - FIXED
 -- =============================================================================
 local Library = {}
 
@@ -61,22 +61,38 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
     TitleLabel.Text = tostring(titoloHub):upper()
     TitleLabel.Parent = TopBar
 
-    -- PULSANTE APERTURA/CHIUSURA COMPLETAMENTE TRASCINABILE CON SUPPORTO ICONE
-    local ToggleMenuBtn = Instance.new("ImageButton")
+    -- PULSANTE APERTURA/CHIUSURA TRASCINABILE (TextButton come base per stabilità)
+    local ToggleMenuBtn = Instance.new("TextButton")
     ToggleMenuBtn.Name = "ToggleMenuBtn"
     ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
     ToggleMenuBtn.Position = UDim2.new(0, 20, 0.3, 0)
     ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    ToggleMenuBtn.Text = ""
     ToggleMenuBtn.Active = true
-    ToggleMenuBtn.Draggable = true -- Ora puoi muoverlo indipendentemente dal menu!
+    ToggleMenuBtn.Draggable = true 
     ToggleMenuBtn.Parent = ScreenGui
 
-    -- Controllo e rendering nativo dell'ID Immagine di Roblox
+    local UICornerBtn = Instance.new("UICorner")
+    UICornerBtn.CornerRadius = UDim.new(1, 0)
+    UICornerBtn.Parent = ToggleMenuBtn
+
+    local UIStrokeBtn = Instance.new("UIStroke")
+    UIStrokeBtn.Thickness = 1.5
+    UIStrokeBtn.Color = Color3.fromRGB(150, 255, 0)
+    UIStrokeBtn.Parent = ToggleMenuBtn
+
+    -- Gestione dinamica dell'icona (Fix per evitare l'errore ImagePadding)
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
-        ToggleMenuBtn.Image = "rbxassetid://" .. pulitoID
-        ToggleMenuBtn.ScaleType = Enum.ScaleType.Fit
-        ToggleMenuBtn.ImagePadding = UDim2.new(0, 5, 0, 5)
+        local IconLabel = Instance.new("ImageLabel")
+        IconLabel.Name = "IconLabel"
+        -- Ridotto leggermente per creare l'effetto padding/bordo interno in modo sicuro
+        IconLabel.Size = UDim2.new(1, -12, 1, -12)
+        IconLabel.Position = UDim2.new(0, 6, 0, 6)
+        IconLabel.BackgroundTransparency = 1
+        IconLabel.Image = "rbxassetid://" .. pulitoID
+        IconLabel.ScaleType = Enum.ScaleType.Fit
+        IconLabel.Parent = ToggleMenuBtn
     else
         local fallbackText = Instance.new("TextLabel")
         fallbackText.Size = UDim2.new(1, 0, 1, 0)
@@ -87,15 +103,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
         fallbackText.Text = "SCO X"
         fallbackText.Parent = ToggleMenuBtn
     end
-
-    local UICornerBtn = Instance.new("UICorner")
-    UICornerBtn.CornerRadius = UDim.new(1, 0)
-    UICornerBtn.Parent = ToggleMenuBtn
-
-    local UIStrokeBtn = Instance.new("UIStroke")
-    UIStrokeBtn.Thickness = 1.5
-    UIStrokeBtn.Color = Color3.fromRGB(150, 255, 0)
-    UIStrokeBtn.Parent = ToggleMenuBtn
 
     ToggleMenuBtn.MouseButton1Click:Connect(function()
         MainFrame.Visible = not MainFrame.Visible
