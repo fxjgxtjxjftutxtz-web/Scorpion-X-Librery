@@ -1,14 +1,17 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (PERFECT IMAGE BUTTON FIX)
+-- SCORPION X - UI LIBRARY ENGINE (COMPLETO)
 -- =============================================================================
 local Library = {}
 
-function Library:Inizializza(titoloHub, idIconaPulsante)
+function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local Players = game:GetService("Players")
     local CoreGui = game:GetService("CoreGui")
+    local UserInputService = game:GetService("UserInputService")
+    local TweenService = game:GetService("TweenService")
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
 
+    -- Rimuove vecchie istanze se presenti
     local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
     if oldGui then oldGui:Destroy() end
 
@@ -61,14 +64,13 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
     TitleLabel.Text = tostring(titoloHub):upper()
     TitleLabel.Parent = TopBar
 
-    -- PULSANTE APERTURA/CHIUSURA TRASCINABILE (ImageButton se c'è l'icona, TextButton come fallback)
+    -- PULSANTE APERTURA/CHIUSURA FLUTTUANTE
     local ToggleMenuBtn
-    
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
         ToggleMenuBtn = Instance.new("ImageButton")
         ToggleMenuBtn.Image = "rbxassetid://" .. pulitoID
-        ToggleMenuBtn.ScaleType = Enum.ScaleType.Crop -- Fa combaciare l'immagine al 100% senza distorcerla
+        ToggleMenuBtn.ScaleType = Enum.ScaleType.Crop
         ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     else
         ToggleMenuBtn = Instance.new("TextButton")
@@ -80,13 +82,12 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
     end
 
     ToggleMenuBtn.Name = "ToggleMenuBtn"
-    ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
+    ToggleMenuBtn.Size = UDim2.new(0, 50, 0, 50)
     ToggleMenuBtn.Position = UDim2.new(0, 20, 0.3, 0)
     ToggleMenuBtn.Active = true
     ToggleMenuBtn.Draggable = true 
     ToggleMenuBtn.Parent = ScreenGui
 
-    -- L'UICorner applicato all'ImageButton taglierà l'immagine stessa a cerchio perfetto
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(1, 0)
     UICornerBtn.Parent = ToggleMenuBtn
@@ -100,6 +101,15 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
         MainFrame.Visible = not MainFrame.Visible
     end)
 
+    -- CHIUSURA MENU TRAMITE TASTIERA
+    local menuBind = tastoChiusuraDefault or Enum.KeyCode.RightControl
+    UserInputService.InputBegan:Connect(function(input, processed)
+        if not processed and input.KeyCode == menuBind then
+            MainFrame.Visible = not MainFrame.Visible
+        end
+    end)
+
+    -- SIDEBAR (MENU LATERALE DELLE SCHEDE)
     local SideBar = Instance.new("ScrollingFrame")
     SideBar.Name = "SideBar"
     SideBar.Size = UDim2.new(0, 130, 0, 285)
@@ -114,6 +124,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
     SideBarList.SortOrder = Enum.SortOrder.LayoutOrder
     SideBarList.Parent = SideBar
 
+    -- CONTENITORE DELLE SCHEDE
     local ContentContainer = Instance.new("Frame")
     ContentContainer.Name = "ContentContainer"
     ContentContainer.Size = UDim2.new(0, 360, 0, 285)
@@ -123,6 +134,75 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
 
     local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil }
 
+    -- NOTIFICHE (TOAST)
+    function Library:Notifica(titolo, messaggio, durata)
+        durata = durata or 4
+        local NotificationStorage = ScreenGui:FindFirstChild("NotificationStorage")
+        if not NotificationStorage then
+            NotificationStorage = Instance.new("Frame")
+            NotificationStorage.Name = "NotificationStorage"
+            NotificationStorage.Size = UDim2.new(0, 250, 0, 400)
+            NotificationStorage.Position = UDim2.new(1, -260, 1, -410)
+            NotificationStorage.BackgroundTransparency = 1
+            NotificationStorage.Parent = ScreenGui
+
+            local layout = Instance.new("UIListLayout")
+            layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+            layout.Padding = UDim.new(0, 8)
+            layout.Parent = NotificationStorage
+        end
+
+        local NotifFrame = Instance.new("Frame")
+        NotifFrame.Size = UDim2.new(1, 0, 0, 60)
+        NotifFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        NotifFrame.Parent = NotificationStorage
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 6)
+        corner.Parent = NotifFrame
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Thickness = 1
+        stroke.Color = Color3.fromRGB(150, 255, 0)
+        stroke.Parent = NotifFrame
+
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(1, -20, 0, 20)
+        titleLabel.Position = UDim2.new(0, 10, 0, 5)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
+        titleLabel.Font = Enum.Font.SourceSansBold
+        titleLabel.TextSize = 13
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.Text = titolo:upper()
+        titleLabel.Parent = NotifFrame
+
+        local msgLabel = Instance.new("TextLabel")
+        msgLabel.Size = UDim2.new(1, -20, 0, 30)
+        msgLabel.Position = UDim2.new(0, 10, 0, 22)
+        msgLabel.BackgroundTransparency = 1
+        msgLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        msgLabel.Font = Enum.Font.SourceSans
+        msgLabel.TextSize = 12
+        msgLabel.TextWrapped = true
+        msgLabel.TextXAlignment = Enum.TextXAlignment.Left
+        msgLabel.TextYAlignment = Enum.TextYAlignment.Top
+        msgLabel.Text = messaggio
+        msgLabel.Parent = NotifFrame
+
+        task.spawn(function()
+            task.wait(durata)
+            local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            TweenService:Create(NotifFrame, info, {BackgroundTransparency = 1}):Play()
+            TweenService:Create(titleLabel, info, {TextTransparency = 1}):Play()
+            TweenService:Create(msgLabel, info, {TextTransparency = 1}):Play()
+            local sTween = TweenService:Create(stroke, info, {Transparency = 1})
+            sTween:Play()
+            sTween.Completed:Connect(function() NotifFrame:Destroy() end)
+        end)
+    end
+
+    -- CREAZIONE TAB
     function InterfacciaEngine:CreaTab(name, order)
         local contentFrame = Instance.new("ScrollingFrame")
         contentFrame.Name = name .. "Tab"
@@ -193,6 +273,27 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
         return contentFrame
     end
 
+    -- ELEMENTO: SEZIONE
+    function InterfacciaEngine:AggiungiSezione(parentTab, text)
+        local container = Instance.new("Frame")
+        container.Size = UDim2.new(0.95, 0, 0, 25)
+        container.BackgroundTransparency = 1
+        container.Parent = parentTab
+
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.TextColor3 = Color3.fromRGB(150, 255, 0)
+        label.Font = Enum.Font.SourceSansBold
+        label.TextSize = 11
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Text = "—— " .. text:upper() .. " ——"
+        label.Parent = container
+
+        return container
+    end
+
+    -- ELEMENTO: TOGGLE
     function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 48)
@@ -273,6 +374,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
         return container
     end
 
+    -- ELEMENTO: DROPDOWN
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
         local dropContainer = Instance.new("Frame")
         dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
@@ -371,8 +473,206 @@ function Library:Inizializza(titoloHub, idIconaPulsante)
         end)
     end
 
+    -- ELEMENTO: SLIDER
+    function InterfacciaEngine:AggiungiSlider(parentTab, titleText, min, max, default, callback)
+        local container = Instance.new("Frame")
+        container.Size = UDim2.new(0.95, 0, 0, 50)
+        container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+        container.Parent = parentTab
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 6)
+        corner.Parent = container
+
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(0.7, 0, 0, 20)
+        titleLabel.Position = UDim2.new(0, 10, 0, 5)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        titleLabel.Font = Enum.Font.SourceSansSemibold
+        titleLabel.TextSize = 13
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.Text = titleText
+        titleLabel.Parent = container
+
+        local valueLabel = Instance.new("TextLabel")
+        valueLabel.Size = UDim2.new(0.25, 0, 0, 20)
+        valueLabel.Position = UDim2.new(0.7, 10, 0, 5)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
+        valueLabel.Font = Enum.Font.SourceSansBold
+        valueLabel.TextSize = 13
+        valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+        valueLabel.Text = tostring(default)
+        valueLabel.Parent = container
+
+        local sliderBg = Instance.new("Frame")
+        sliderBg.Size = UDim2.new(0.9, 0, 0, 6)
+        sliderBg.Position = UDim2.new(0.05, 0, 0.7, 0)
+        sliderBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        sliderBg.Parent = container
+
+        local sliderBgCorner = Instance.new("UICorner")
+        sliderBgCorner.CornerRadius = UDim.new(1, 0)
+        sliderBgCorner.Parent = sliderBg
+
+        local sliderFill = Instance.new("Frame")
+        sliderFill.Size = UDim2.new(math.clamp((default - min) / (max - min), 0, 1), 0, 1, 0)
+        sliderFill.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
+        sliderFill.Parent = sliderBg
+
+        local sliderFillCorner = Instance.new("UICorner")
+        sliderFillCorner.CornerRadius = UDim.new(1, 0)
+        sliderFillCorner.Parent = sliderFill
+
+        local dragging = false
+        local function update(input)
+            local percentage = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
+            sliderFill.Size = UDim2.new(percentage, 0, 1, 0)
+            local value = math.floor(min + ((max - min) * percentage))
+            valueLabel.Text = tostring(value)
+            callback(value)
+        end
+
+        sliderBg.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = true
+                update(input)
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(input)
+            if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                update(input)
+            end
+        end)
+
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                dragging = false
+            end
+        end)
+
+        return container
+    end
+
+    -- ELEMENTO: TEXTBOX
+    function InterfacciaEngine:AggiungiTextBox(parentTab, titleText, placeholderText, callback)
+        local container = Instance.new("Frame")
+        container.Size = UDim2.new(0.95, 0, 0, 45)
+        container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+        container.Parent = parentTab
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 6)
+        corner.Parent = container
+
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(0.4, 0, 1, 0)
+        titleLabel.Position = UDim2.new(0, 10, 0, 0)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        titleLabel.Font = Enum.Font.SourceSansSemibold
+        titleLabel.TextSize = 13
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.Text = titleText
+        titleLabel.Parent = container
+
+        local boxContainer = Instance.new("Frame")
+        boxContainer.Size = UDim2.new(0.5, 0, 0, 26)
+        boxContainer.Position = UDim2.new(0.5, -10, 0.5, -13)
+        boxContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        boxContainer.Parent = container
+
+        local boxCorner = Instance.new("UICorner")
+        boxCorner.CornerRadius = UDim.new(0, 4)
+        boxCorner.Parent = boxContainer
+
+        local textBox = Instance.new("TextBox")
+        textBox.Size = UDim2.new(1, -10, 1, 0)
+        textBox.Position = UDim2.new(0, 5, 0, 0)
+        textBox.BackgroundTransparency = 1
+        textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+        textBox.PlaceholderText = placeholderText
+        textBox.Text = ""
+        textBox.Font = Enum.Font.SourceSans
+        textBox.TextSize = 12
+        textBox.TextXAlignment = Enum.TextXAlignment.Left
+        textBox.ClearTextOnFocus = false
+        textBox.Parent = boxContainer
+
+        textBox.FocusLost:Connect(function(enterPressed)
+            callback(textBox.Text, enterPressed)
+        end)
+
+        return container
+    end
+
+    -- ELEMENTO: KEYBIND
+    function InterfacciaEngine:AggiungiKeybind(parentTab, titleText, defaultKey, callback)
+        local container = Instance.new("Frame")
+        container.Size = UDim2.new(0.95, 0, 0, 40)
+        container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+        container.Parent = parentTab
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 6)
+        corner.Parent = container
+
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(0.6, 0, 1, 0)
+        titleLabel.Position = UDim2.new(0, 10, 0, 0)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        titleLabel.Font = Enum.Font.SourceSansSemibold
+        titleLabel.TextSize = 13
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.Text = titleText
+        titleLabel.Parent = container
+
+        local bindBtn = Instance.new("TextButton")
+        bindBtn.Size = UDim2.new(0, 80, 0, 24)
+        bindBtn.Position = UDim2.new(1, -90, 0.5, -12)
+        bindBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        bindBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
+        bindBtn.Font = Enum.Font.SourceSansBold
+        bindBtn.TextSize = 12
+        bindBtn.Text = defaultKey.Name
+        bindBtn.Parent = container
+
+        local bCorner = Instance.new("UICorner")
+        bCorner.CornerRadius = UDim.new(0, 4)
+        bCorner.Parent = bindBtn
+
+        local currentKey = defaultKey
+        local listening = false
+
+        bindBtn.MouseButton1Click:Connect(function()
+            listening = true
+            bindBtn.Text = "..."
+            bindBtn.TextColor3 = Color3.fromRGB(255, 255, 0)
+        end)
+
+        UserInputService.InputBegan:Connect(function(input, processed)
+            if processed then return end
+            if listening and input.UserInputType == Enum.UserInputType.Keyboard then
+                listening = false
+                currentKey = input.KeyCode
+                bindBtn.Text = currentKey.Name
+                bindBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
+                callback(currentKey, false)
+            elseif not listening and input.KeyCode == currentKey then
+                callback(currentKey, true)
+            end
+        end)
+
+        return container
+    end
+
+    -- AVVIO AUTOMATICO PRIMA TAB
     task.spawn(function()
-        task.wait(0.5)
+        task.wait(0.2)
         if self.primaTab and self.tabs[self.primaTab] then
             self.tabs[self.primaTab].Visible = true
             local btn = self.tabButtons[self.primaTab]
