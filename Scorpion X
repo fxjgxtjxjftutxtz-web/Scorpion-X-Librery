@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (VERSIONE COMPLETA AGGIORNATA)
+-- SCORPION X - UI LIBRARY ENGINE (VERSIONE COMPLETA AGGIORNATA CON ICONE E COMFORT)
 -- =============================================================================
 local Library = {}
 
@@ -53,9 +53,24 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     TopBarCorner.CornerRadius = UDim.new(0, 10)
     TopBarCorner.Parent = TopBar
 
+    -- LOGO/ICONA ANCHE NEL MENU PRINCIPALE
+    local offsetTitolo = 15
+    if idIconaPulsante and idIconaPulsante ~= "" then
+        local pulitoID = tostring(idIconaPulsante):match("%d+")
+        local MenuIcon = Instance.new("ImageLabel")
+        MenuIcon.Name = "MenuIcon"
+        MenuIcon.Size = UDim2.new(0, 20, 0, 20)
+        MenuIcon.Position = UDim2.new(0, 10, 0, 7.5)
+        MenuIcon.BackgroundTransparency = 1
+        MenuIcon.Image = "rbxassetid://" .. pulitoID
+        MenuIcon.ScaleType = Enum.ScaleType.Fit
+        MenuIcon.Parent = TopBar
+        offsetTitolo = 38
+    end
+
     local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -20, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+    TitleLabel.Size = UDim2.new(1, -offsetTitolo, 1, 0)
+    TitleLabel.Position = UDim2.new(0, offsetTitolo, 0, 0)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     TitleLabel.Font = Enum.Font.SourceSansBold
@@ -132,11 +147,11 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     ContentContainer.BackgroundTransparency = 1
     ContentContainer.Parent = MainFrame
 
-    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil }
+    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil, activeDropdownBtn = nil, activeDropdownText = "" }
 
     -- FUNZIONE: NOTIFICA TOAST
     function Library:Notifica(titolo, messaggio, durata)
-        durata = durata or 4
+        durata = duration or 4
         local NotificationStorage = ScreenGui:FindFirstChild("NotificationStorage")
         if not NotificationStorage then
             NotificationStorage = Instance.new("Frame")
@@ -202,8 +217,8 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         end)
     end
 
-    -- STRUTTURA: CREA TAB
-    function InterfacciaEngine:CreaTab(name, order)
+    -- STRUTTURA: CREA TAB (AGGIORNATA CON SUPPORTO ICONE)
+    function InterfacciaEngine:CreaTab(name, order, idIconaTab)
         local contentFrame = Instance.new("ScrollingFrame")
         contentFrame.Name = name .. "Tab"
         contentFrame.Size = UDim2.new(1, 0, 1, 0)
@@ -233,10 +248,23 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         tabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
         tabBtn.Font = Enum.Font.SourceSansSemibold
         tabBtn.TextSize = 13
-        tabBtn.Text = "  " .. name
+        tabBtn.Text = idIconaTab and "      " .. name or "  " .. name
         tabBtn.TextXAlignment = Enum.TextXAlignment.Left
         tabBtn.LayoutOrder = order
         tabBtn.Parent = SideBar
+
+        -- Se viene passata un'icona per la tab, la inseriamo nel pulsante
+        if idIconaTab and idIconaTab ~= "" then
+            local pulitoTabID = tostring(idIconaTab):match("%d+")
+            local TabIcon = Instance.new("ImageLabel")
+            TabIcon.Name = "TabIcon"
+            TabIcon.Size = UDim2.new(0, 16, 0, 16)
+            TabIcon.Position = UDim2.new(0, 6, 0.5, -8)
+            TabIcon.BackgroundTransparency = 1
+            TabIcon.Image = "rbxassetid://" .. pulitoTabID
+            TabIcon.ScaleType = Enum.ScaleType.Fit
+            TabIcon.Parent = tabBtn
+        end
 
         local btnCorner = Instance.new("UICorner")
         btnCorner.CornerRadius = UDim.new(0, 6)
@@ -254,17 +282,21 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
                 self.activeDropdownFrame.Visible = false
                 self.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
                 self.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                self.activeDropdownBtn.Text = "  " .. self.activeDropdownText:upper() .. "  ▼"
                 self.activeDropdownFrame = nil
                 self.activeDropdownContainer = nil
+                self.activeDropdownBtn = nil
             end
             for tName, frame in pairs(self.tabs) do frame.Visible = (tName == name) end
             for bName, btn in pairs(self.tabButtons) do
                 if bName == name then
                     btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
                     btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+                    if btn:FindFirstChild("TabIcon") then btn.TabIcon.ImageColor3 = Color3.fromRGB(0, 0, 0) end
                 else
                     btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
                     btn.TextColor3 = Color3.fromRGB(180, 180, 180)
+                    if btn:FindFirstChild("TabIcon") then btn.TabIcon.ImageColor3 = Color3.fromRGB(255, 255, 255) end
                 end
             end
         end)
@@ -448,8 +480,9 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- ELEMENTO: DROPDOWN
+    -- ELEMENTO: DROPDOWN (AGGIORNATO CON FRECCE DINAMICHE ▲ / ▼)
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
+        local currentText = defaultText
         local dropContainer = Instance.new("Frame")
         dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
         dropContainer.BackgroundTransparency = 1
@@ -462,7 +495,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         dropBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
         dropBtn.Font = Enum.Font.SourceSansBold
         dropBtn.TextSize = 13
-        dropBtn.Text = "  " .. defaultText:upper() .. "  ▼"
+        dropBtn.Text = "  " .. currentText:upper() .. "  ▼"
         dropBtn.TextXAlignment = Enum.TextXAlignment.Left
         dropBtn.Parent = dropContainer
 
@@ -512,12 +545,14 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
             opt.Parent = dropListFrame
 
             opt.Activated:Connect(function()
-                dropBtn.Text = "  " .. tostring(val.Text or val):upper() .. "  ▼"
+                currentText = tostring(val.Text or val)
+                dropBtn.Text = "  " .. currentText:upper() .. "  ▼"
                 dropListFrame.Visible = false
                 dropListFrame.Size = UDim2.new(1, 0, 0, 0)
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
                 InterfacciaEngine.activeDropdownFrame = nil
                 InterfacciaEngine.activeDropdownContainer = nil
+                InterfacciaEngine.activeDropdownBtn = nil
                 callback(val.Value or val)
             end)
         end
@@ -527,22 +562,28 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
                 dropListFrame.Visible = false
                 dropListFrame.Size = UDim2.new(1, 0, 0, 0)
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                dropBtn.Text = "  " .. currentText:upper() .. "  ▼" -- Cambia in Giù
                 InterfacciaEngine.activeDropdownFrame = nil
                 InterfacciaEngine.activeDropdownContainer = nil
+                InterfacciaEngine.activeDropdownBtn = nil
             else
                 if InterfacciaEngine.activeDropdownFrame and InterfacciaEngine.activeDropdownFrame ~= dropListFrame then
                     InterfacciaEngine.activeDropdownFrame.Visible = false
                     InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
                     InterfacciaEngine.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                    InterfacciaEngine.activeDropdownBtn.Text = "  " .. InterfacciaEngine.activeDropdownText:upper() .. "  ▼"
                 end
                 
                 dropListFrame.Visible = true
                 local altezzaLista = math.min(#options * 30, 120)
                 dropListFrame.Size = UDim2.new(1, 0, 0, altezzaLista)
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35 + altezzaLista + 5)
+                dropBtn.Text = "  " .. currentText:upper() .. "  ▲" -- Cambia in Su
                 
                 InterfacciaEngine.activeDropdownFrame = dropListFrame
                 InterfacciaEngine.activeDropdownContainer = dropContainer
+                InterfacciaEngine.activeDropdownBtn = dropBtn
+                InterfacciaEngine.activeDropdownText = currentText
             end
         end)
     end
@@ -753,6 +794,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
             if btn then
                 btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
                 btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+                if btn:FindFirstChild("TabIcon") then btn.TabIcon.ImageColor3 = Color3.fromRGB(0, 0, 0) end
             end
         end
     end)
@@ -761,3 +803,4 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 end
 
 return Library
+
