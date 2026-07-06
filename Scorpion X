@@ -1,744 +1,745 @@
-local Library = {}
+local vecchioMenu = game:GetService("CoreGui"):FindFirstChild("ScorpioXMenu") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("ScorpioXMenu")
+if vecchioMenu then vecchioMenu:Destroy() end
 
-function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
-    local Players = game:GetService("Players")
-    local CoreGui = game:GetService("CoreGui")
-    local UserInputService = game:GetService("UserInputService")
-    local TweenService = game:GetService("TweenService")
-    local player = Players.LocalPlayer
-    local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
+local URL_LIBRERIA = "https://raw.githubusercontent.com/fxjgxtjxjftutxtz-web/Scorpion-X-Librery/refs/heads/main/Scorpion%20X"
 
-    local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
-    if oldGui then oldGui:Destroy() end
+local successo, LibreriaRemota = pcall(function()
+    return loadstring(game:HttpGet(URL_LIBRERIA))()
+end)
 
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ScorpioXMenu"
-    ScreenGui.ResetOnSpawn = false
-    ScreenGui.DisplayOrder = 100
-
-    local successo = pcall(function() ScreenGui.Parent = CoreGui end)
-    if not successo then ScreenGui.Parent = playerGui end
-
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Name = "MainFrame"
-    MainFrame.Size = UDim2.new(0, 520, 0, 340)
-    MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    MainFrame.Active = true
-    MainFrame.Draggable = true 
-    MainFrame.Visible = true
-    MainFrame.Parent = ScreenGui
-
-    local UICornerFrame = Instance.new("UICorner")
-    UICornerFrame.CornerRadius = UDim.new(0, 10)
-    UICornerFrame.Parent = MainFrame
-
-    local UIStrokeFrame = Instance.new("UIStroke")
-    UIStrokeFrame.Thickness = 1.5
-    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0)
-    UIStrokeFrame.Parent = MainFrame
-
-    local TopBar = Instance.new("Frame")
-    TopBar.Name = "TopBar"
-    TopBar.Size = UDim2.new(1, 0, 0, 35)
-    TopBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-    TopBar.Parent = MainFrame
-
-    local TopBarCorner = Instance.new("UICorner")
-    TopBarCorner.CornerRadius = UDim.new(0, 10)
-    TopBarCorner.Parent = TopBar
-
-    local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -20, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 15, 0, 0)
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TitleLabel.Font = Enum.Font.SourceSansBold
-    TitleLabel.TextSize = 14
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TitleLabel.Text = tostring(titoloHub):upper()
-    TitleLabel.Parent = TopBar
-
-    local ToggleMenuBtn
-    if idIconaPulsante and idIconaPulsante ~= "" then
-        local pulitoID = tostring(idIconaPulsante):match("%d+")
-        ToggleMenuBtn = Instance.new("ImageButton")
-        ToggleMenuBtn.Image = "rbxassetid://" .. pulitoID
-        ToggleMenuBtn.ScaleType = Enum.ScaleType.Crop
-        ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    else
-        ToggleMenuBtn = Instance.new("TextButton")
-        ToggleMenuBtn.Text = "SCO X"
-        ToggleMenuBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
-        ToggleMenuBtn.Font = Enum.Font.SourceSansBold
-        ToggleMenuBtn.TextSize = 14
-        ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    end
-
-    ToggleMenuBtn.Name = "ToggleMenuBtn"
-    ToggleMenuBtn.Size = UDim2.new(0, 50, 0, 50)
-    ToggleMenuBtn.Position = UDim2.new(0, 20, 0.3, 0)
-    ToggleMenuBtn.Active = true
-    ToggleMenuBtn.Draggable = true 
-    ToggleMenuBtn.Parent = ScreenGui
-
-    local UICornerBtn = Instance.new("UICorner")
-    UICornerBtn.CornerRadius = UDim.new(1, 0)
-    UICornerBtn.Parent = ToggleMenuBtn
-
-    local UIStrokeBtn = Instance.new("UIStroke")
-    UIStrokeBtn.Thickness = 1.5
-    UIStrokeBtn.Color = Color3.fromRGB(150, 255, 0)
-    UIStrokeBtn.Parent = ToggleMenuBtn
-
-    ToggleMenuBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = not MainFrame.Visible
-    end)
-
-    local menuBind = tastoChiusuraDefault or Enum.KeyCode.RightControl
-    UserInputService.InputBegan:Connect(function(input, processed)
-        if not processed and input.KeyCode == menuBind then
-            MainFrame.Visible = not MainFrame.Visible
-        end
-    end)
-
-    local SideBar = Instance.new("ScrollingFrame")
-    SideBar.Name = "SideBar"
-    SideBar.Size = UDim2.new(0, 130, 0, 285)
-    SideBar.Position = UDim2.new(0, 10, 0, 45)
-    SideBar.BackgroundTransparency = 1
-    SideBar.CanvasSize = UDim2.new(0, 0, 0, 400)
-    SideBar.ScrollBarThickness = 0
-    SideBar.Parent = MainFrame
-
-    local SideBarList = Instance.new("UIListLayout")
-    SideBarList.Padding = UDim.new(0, 5)
-    SideBarList.SortOrder = Enum.SortOrder.LayoutOrder
-    SideBarList.Parent = SideBar
-
-    local ContentContainer = Instance.new("Frame")
-    ContentContainer.Name = "ContentContainer"
-    ContentContainer.Size = UDim2.new(0, 360, 0, 285)
-    ContentContainer.Position = UDim2.new(0, 150, 0, 45)
-    ContentContainer.BackgroundTransparency = 1
-    ContentContainer.Parent = MainFrame
-
-    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil }
-
-    function Library:Notifica(titolo, messaggio, durata)
-        durata = durata or 4
-        local NotificationStorage = ScreenGui:FindFirstChild("NotificationStorage")
-        if not NotificationStorage then
-            NotificationStorage = Instance.new("Frame")
-            NotificationStorage.Name = "NotificationStorage"
-            NotificationStorage.Size = UDim2.new(0, 250, 0, 400)
-            NotificationStorage.Position = UDim2.new(1, -260, 1, -410)
-            NotificationStorage.BackgroundTransparency = 1
-            NotificationStorage.Parent = ScreenGui
-
-            local layout = Instance.new("UIListLayout")
-            layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-            layout.Padding = UDim.new(0, 8)
-            layout.Parent = NotificationStorage
-        end
-
-        local NotifFrame = Instance.new("Frame")
-        NotifFrame.Size = UDim2.new(1, 0, 0, 60)
-        NotifFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-        NotifFrame.Parent = NotificationStorage
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 6)
-        corner.Parent = NotifFrame
-
-        local stroke = Instance.new("UIStroke")
-        stroke.Thickness = 1
-        stroke.Color = Color3.fromRGB(150, 255, 0)
-        stroke.Parent = NotifFrame
-
-        local titleLabel = Instance.new("TextLabel")
-        titleLabel.Size = UDim2.new(1, -20, 0, 20)
-        titleLabel.Position = UDim2.new(0, 10, 0, 5)
-        titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
-        titleLabel.Font = Enum.Font.SourceSansBold
-        titleLabel.TextSize = 13
-        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        titleLabel.Text = titolo:upper()
-        titleLabel.Parent = NotifFrame
-
-        local msgLabel = Instance.new("TextLabel")
-        msgLabel.Size = UDim2.new(1, -20, 0, 30)
-        msgLabel.Position = UDim2.new(0, 10, 0, 22)
-        msgLabel.BackgroundTransparency = 1
-        msgLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        msgLabel.Font = Enum.Font.SourceSans
-        msgLabel.TextSize = 12
-        msgLabel.TextWrapped = true
-        msgLabel.TextXAlignment = Enum.TextXAlignment.Left
-        msgLabel.TextYAlignment = Enum.TextYAlignment.Top
-        msgLabel.Text = messaggio
-        msgLabel.Parent = NotifFrame
-
-        task.spawn(function()
-            task.wait(durata)
-            local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            TweenService:Create(NotifFrame, info, {BackgroundTransparency = 1}):Play()
-            TweenService:Create(titleLabel, info, {TextTransparency = 1}):Play()
-            TweenService:Create(msgLabel, info, {TextTransparency = 1}):Play()
-            local sTween = TweenService:Create(stroke, info, {Transparency = 1})
-            sTween:Play()
-            sTween.Completed:Connect(function() NotifFrame:Destroy() end)
-        end)
-    end
-
-    function InterfacciaEngine:CreaTab(name, order)
-        local contentFrame = Instance.new("ScrollingFrame")
-        contentFrame.Name = name .. "Tab"
-        contentFrame.Size = UDim2.new(1, 0, 1, 0)
-        contentFrame.BackgroundTransparency = 1
-        contentFrame.CanvasSize = UDim2.new(0, 0, 0, 500)
-        contentFrame.ScrollBarThickness = 3
-        contentFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 255, 0)
-        contentFrame.Visible = false
-        contentFrame.ClipsDescendants = true
-        contentFrame.Parent = ContentContainer
-
-        local listLayout = Instance.new("UIListLayout")
-        listLayout.Padding = UDim.new(0, 6)
-        listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        listLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        listLayout.Parent = contentFrame
-
-        listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 20)
-        end)
-
-        self.tabs[name] = contentFrame
-
-        local tabBtn = Instance.new("TextButton")
-        tabBtn.Size = UDim2.new(0, 120, 0, 32)
-        tabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        tabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
-        tabBtn.Font = Enum.Font.SourceSansSemibold
-        tabBtn.TextSize = 13
-        tabBtn.Text = name
-        tabBtn.TextXAlignment = Enum.TextXAlignment.Left
-        tabBtn.LayoutOrder = order
-        tabBtn.Parent = SideBar
-
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 6)
-        btnCorner.Parent = tabBtn
-        
-        local btnStroke = Instance.new("UIStroke")
-        btnStroke.Thickness = 1
-        btnStroke.Color = Color3.fromRGB(40, 40, 40)
-        btnStroke.Parent = tabBtn
-
-        if not self.primaTab then self.primaTab = name end
-
-        tabBtn.MouseButton1Click:Connect(function()
-            if self.activeDropdownFrame then
-                self.activeDropdownFrame.Visible = false
-                self.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
-                self.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
-                self.activeDropdownFrame = nil
-                self.activeDropdownContainer = nil
-            end
-            for tName, frame in pairs(self.tabs) do frame.Visible = (tName == name) end
-            for bName, btn in pairs(self.tabButtons) do
-                if bName == name then
-                    btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
-                    btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-                else
-                    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-                    btn.TextColor3 = Color3.fromRGB(180, 180, 180)
-                end
-            end
-        end)
-
-        self.tabButtons[name] = tabBtn
-        return contentFrame
-    end
-
-    function InterfacciaEngine:AggiungiSezione(parentTab, text)
-        local container = Instance.new("Frame")
-        container.Size = UDim2.new(0.95, 0, 0, 25)
-        container.BackgroundTransparency = 1
-        container.Parent = parentTab
-
-        local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(1, 0, 1, 0)
-        label.BackgroundTransparency = 1
-        label.TextColor3 = Color3.fromRGB(150, 255, 0)
-        label.Font = Enum.Font.SourceSansBold
-        label.TextSize = 11
-        label.TextXAlignment = Enum.TextXAlignment.Left
-        label.Text = text:upper()
-        label.Parent = container
-
-        return container
-    end
-
-    function InterfacciaEngine:AggiungiParagrafo(parentTab, titoloTesto, corpoTesto)
-        local container = Instance.new("Frame")
-        container.Size = UDim2.new(0.95, 0, 0, 60)
-        container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-        container.Parent = parentTab
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 6)
-        corner.Parent = container
-
-        local stroke = Instance.new("UIStroke")
-        stroke.Thickness = 1
-        stroke.Color = Color3.fromRGB(40, 40, 40)
-        stroke.Parent = container
-
-        local titleLabel = Instance.new("TextLabel")
-        titleLabel.Size = UDim2.new(1, -20, 0, 20)
-        titleLabel.Position = UDim2.new(0, 10, 0, 5)
-        titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
-        titleLabel.Font = Enum.Font.SourceSansBold
-        titleLabel.TextSize = 12
-        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        titleLabel.Text = titoloTesto:upper()
-        titleLabel.Parent = container
-
-        local textLabel = Instance.new("TextLabel")
-        textLabel.Size = UDim2.new(1, -20, 1, -25)
-        textLabel.Position = UDim2.new(0, 10, 0, 22)
-        textLabel.BackgroundTransparency = 1
-        textLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-        textLabel.Font = Enum.Font.SourceSans
-        textLabel.TextSize = 11
-        textLabel.TextWrapped = true
-        textLabel.TextXAlignment = Enum.TextXAlignment.Left
-        textLabel.TextYAlignment = Enum.TextYAlignment.Top
-        textLabel.Text = corpoTesto
-        textLabel.Parent = container
-
-        textLabel:GetPropertyChangedSignal("TextBounds"):Connect(function()
-            container.Size = UDim2.new(0.95, 0, 0, textLabel.TextBounds.Y + 35)
-        end)
-
-        return container
-    end
-
-    function InterfacciaEngine:AggiungiButton(parentTab, text, callback)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0.95, 0, 0, 32)
-        btn.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.Font = Enum.Font.SourceSansSemibold
-        btn.TextSize = 13
-        btn.Text = text
-        btn.Parent = parentTab
-
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 6)
-        btnCorner.Parent = btn
-        
-        local btnStroke = Instance.new("UIStroke")
-        btnStroke.Thickness = 1
-        btnStroke.Color = Color3.fromRGB(150, 255, 0)
-        btnStroke.Parent = btn
-
-        btn.MouseButton1Click:Connect(function()
-            callback()
-        end)
-
-        return btn
-    end
-
-    function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
-        local container = Instance.new("Frame")
-        container.Size = UDim2.new(0.95, 0, 0, 48)
-        container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-        container.Parent = parentTab
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 6)
-        corner.Parent = container
-        
-        local stroke = Instance.new("UIStroke")
-        stroke.Thickness = 1
-        stroke.Color = Color3.fromRGB(40, 40, 40)
-        stroke.Parent = container
-
-        local titleLabel = Instance.new("TextLabel")
-        titleLabel.Size = UDim2.new(0.7, 0, 0, 20)
-        titleLabel.Position = UDim2.new(0, 10, 0, 5)
-        titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        titleLabel.Font = Enum.Font.SourceSansSemibold
-        titleLabel.TextSize = 13
-        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        titleLabel.Text = titleText
-        titleLabel.Parent = container
-
-        local descLabel = Instance.new("TextLabel")
-        descLabel.Size = UDim2.new(0.7, 0, 0, 18)
-        descLabel.Position = UDim2.new(0, 10, 0, 23)
-        descLabel.BackgroundTransparency = 1
-        descLabel.TextColor3 = Color3.fromRGB(140, 140, 140)
-        descLabel.Font = Enum.Font.SourceSans
-        descLabel.TextSize = 11
-        descLabel.TextXAlignment = Enum.TextXAlignment.Left
-        descLabel.Text = descText
-        descLabel.Parent = container
-
-        local toggleBg = Instance.new("Frame")
-        toggleBg.Size = UDim2.new(0, 42, 0, 22)
-        toggleBg.Position = UDim2.new(1, -52, 0.5, -11)
-        toggleBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        toggleBg.Parent = container
-
-        local toggleBgCorner = Instance.new("UICorner")
-        toggleBgCorner.CornerRadius = UDim.new(1, 0)
-        toggleBgCorner.Parent = toggleBg
-
-        local toggleBall = Instance.new("Frame")
-        toggleBall.Size = UDim2.new(0, 16, 0, 16)
-        toggleBall.Position = UDim2.new(0, 3, 0, 3)
-        toggleBall.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
-        toggleBall.Parent = toggleBg
-
-        local toggleBallCorner = Instance.new("UICorner")
-        toggleBallCorner.CornerRadius = UDim.new(1, 0)
-        toggleBallCorner.Parent = toggleBall
-
-        local clickBtn = Instance.new("TextButton")
-        clickBtn.Size = UDim2.new(1, 0, 1, 0)
-        clickBtn.BackgroundTransparency = 1
-        clickBtn.Text = ""
-        clickBtn.Parent = container
-
-        local state = defaultState
-        local function updateVisual()
-            toggleBg.BackgroundColor3 = state and Color3.fromRGB(150, 255, 0) or Color3.fromRGB(40, 40, 40)
-            toggleBall.Position = state and UDim2.new(0, 23, 0, 3) or UDim2.new(0, 3, 0, 3)
-            toggleBall.BackgroundColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(120, 120, 120)
-        end
-
-        updateVisual()
-        clickBtn.MouseButton1Click:Connect(function()
-            state = not state
-            updateVisual()
-            callback(state)
-        end)
-
-        return container
-    end
-
-    function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
-        local dropContainer = Instance.new("Frame")
-        dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
-        dropContainer.BackgroundTransparency = 1
-        dropContainer.ClipsDescendants = true
-        dropContainer.Parent = parentTab
-
-        local dropBtn = Instance.new("TextButton")
-        dropBtn.Size = UDim2.new(1, 0, 0, 35)
-        dropBtn.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-        dropBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
-        dropBtn.Font = Enum.Font.SourceSansBold
-        dropBtn.TextSize = 13
-        dropBtn.Text = defaultText:upper() .. "  ▼"
-        dropBtn.TextXAlignment = Enum.TextXAlignment.Left
-        dropBtn.Parent = dropContainer
-
-        local dropCorner = Instance.new("UICorner")
-        dropCorner.CornerRadius = UDim.new(0, 6)
-        dropCorner.Parent = dropBtn
-        
-        local dropStroke = Instance.new("UIStroke")
-        dropStroke.Thickness = 1
-        dropStroke.Color = Color3.fromRGB(50, 50, 50)
-        dropStroke.Parent = dropBtn
-
-        local dropListFrame = Instance.new("ScrollingFrame")
-        dropListFrame.Name = "DropList"
-        dropListFrame.Size = UDim2.new(1, 0, 0, 0)
-        dropListFrame.Position = UDim2.new(0, 0, 0, 38)
-        dropListFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-        dropListFrame.Visible = false
-        dropListFrame.ScrollBarThickness = 3
-        dropListFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 255, 0)
-        dropListFrame.CanvasSize = UDim2.new(0, 0, 0, #options * 30)
-        dropListFrame.Parent = dropContainer
-        
-        local dCorner = Instance.new("UICorner")
-        dCorner.CornerRadius = UDim.new(0, 6)
-        dCorner.Parent = dropListFrame
-
-        local dStroke = Instance.new("UIStroke")
-        dStroke.Thickness = 1
-        dStroke.Color = Color3.fromRGB(150, 255, 0)
-        dStroke.Parent = dropListFrame
-
-        local dropLayout = Instance.new("UIListLayout")
-        dropLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        dropLayout.Parent = dropListFrame
-
-        for i, val in ipairs(options) do
-            local opt = Instance.new("TextButton")
-            opt.Size = UDim2.new(1, 0, 0, 30)
-            opt.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-            opt.TextColor3 = Color3.fromRGB(255, 255, 255)
-            opt.Font = Enum.Font.SourceSans
-            opt.TextSize = 12
-            opt.Text = tostring(val.Text or val)
-            opt.TextXAlignment = Enum.TextXAlignment.Left
-            opt.LayoutOrder = i
-            opt.Parent = dropListFrame
-
-            opt.Activated:Connect(function()
-                dropBtn.Text = tostring(val.Text or val):upper() .. "  ▼"
-                dropListFrame.Visible = false
-                dropListFrame.Size = UDim2.new(1, 0, 0, 0)
-                dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
-                InterfacciaEngine.activeDropdownFrame = nil
-                InterfacciaEngine.activeDropdownContainer = nil
-                callback(val.Value or val)
-            end)
-        end
-
-        dropBtn.Activated:Connect(function()
-            if dropListFrame.Visible then
-                dropListFrame.Visible = false
-                dropListFrame.Size = UDim2.new(1, 0, 0, 0)
-                dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
-                InterfacciaEngine.activeDropdownFrame = nil
-                InterfacciaEngine.activeDropdownContainer = nil
-            else
-                if InterfacciaEngine.activeDropdownFrame and InterfacciaEngine.activeDropdownFrame ~= dropListFrame then
-                    InterfacciaEngine.activeDropdownFrame.Visible = false
-                    InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
-                    InterfacciaEngine.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
-                end
-                
-                dropListFrame.Visible = true
-                local altezzaLista = math.min(#options * 30, 120)
-                dropListFrame.Size = UDim2.new(1, 0, 0, altezzaLista)
-                dropContainer.Size = UDim2.new(0.95, 0, 0, 35 + altezzaLista + 5)
-                
-                InterfacciaEngine.activeDropdownFrame = dropListFrame
-                InterfacciaEngine.activeDropdownContainer = dropContainer
-            end
-        end)
-    end
-
-    function InterfacciaEngine:AggiungiSlider(parentTab, titleText, min, max, default, callback)
-        local container = Instance.new("Frame")
-        container.Size = UDim2.new(0.95, 0, 0, 50)
-        container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-        container.Parent = parentTab
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 6)
-        corner.Parent = container
-
-        local titleLabel = Instance.new("TextLabel")
-        titleLabel.Size = UDim2.new(0.7, 0, 0, 20)
-        titleLabel.Position = UDim2.new(0, 10, 0, 5)
-        titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        titleLabel.Font = Enum.Font.SourceSansSemibold
-        titleLabel.TextSize = 13
-        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        titleLabel.Text = titleText
-        titleLabel.Parent = container
-
-        local valueLabel = Instance.new("TextLabel")
-        valueLabel.Size = UDim2.new(0.25, 0, 0, 20)
-        valueLabel.Position = UDim2.new(0.7, 10, 0, 5)
-        valueLabel.BackgroundTransparency = 1
-        valueLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
-        valueLabel.Font = Enum.Font.SourceSansBold
-        valueLabel.TextSize = 13
-        valueLabel.TextXAlignment = Enum.TextXAlignment.Right
-        valueLabel.Text = tostring(default)
-        valueLabel.Parent = container
-
-        local sliderBg = Instance.new("Frame")
-        sliderBg.Size = UDim2.new(0.9, 0, 0, 6)
-        sliderBg.Position = UDim2.new(0.05, 0, 0.7, 0)
-        sliderBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        sliderBg.Parent = container
-
-        local sliderBgCorner = Instance.new("UICorner")
-        sliderBgCorner.CornerRadius = UDim.new(1, 0)
-        sliderBgCorner.Parent = sliderBg
-
-        local sliderFill = Instance.new("Frame")
-        sliderFill.Size = UDim2.new(math.clamp((default - min) / (max - min), 0, 1), 0, 1, 0)
-        sliderFill.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
-        sliderFill.Parent = sliderBg
-
-        local sliderFillCorner = Instance.new("UICorner")
-        sliderFillCorner.CornerRadius = UDim.new(1, 0)
-        sliderFillCorner.Parent = sliderFill
-
-        local dragging = false
-        local function update(input)
-            local percentage = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
-            sliderFill.Size = UDim2.new(percentage, 0, 1, 0)
-            local value = math.floor(min + ((max - min) * percentage))
-            valueLabel.Text = tostring(value)
-            callback(value)
-        end
-
-        sliderBg.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                dragging = true
-                update(input)
-            end
-        end)
-
-        UserInputService.InputChanged:Connect(function(input)
-            if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                update(input)
-            end
-        end)
-
-        UserInputService.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                dragging = false
-            end
-        end)
-
-        return container
-    end
-
-    function InterfacciaEngine:AggiungiTextBox(parentTab, titleText, placeholderText, callback)
-        local container = Instance.new("Frame")
-        container.Size = UDim2.new(0.95, 0, 0, 45)
-        container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-        container.Parent = parentTab
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 6)
-        corner.Parent = container
-
-        local titleLabel = Instance.new("TextLabel")
-        titleLabel.Size = UDim2.new(0.4, 0, 1, 0)
-        titleLabel.Position = UDim2.new(0, 10, 0, 0)
-        titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        titleLabel.Font = Enum.Font.SourceSansSemibold
-        titleLabel.TextSize = 13
-        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        titleLabel.Text = titleText
-        titleLabel.Parent = container
-
-        local boxContainer = Instance.new("Frame")
-        boxContainer.Size = UDim2.new(0.5, 0, 0, 26)
-        boxContainer.Position = UDim2.new(0.5, -10, 0.5, -13)
-        boxContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        boxContainer.Parent = container
-
-        local boxCorner = Instance.new("UICorner")
-        boxCorner.CornerRadius = UDim.new(0, 4)
-        boxCorner.Parent = boxContainer
-
-        local textBox = Instance.new("TextBox")
-        textBox.Size = UDim2.new(1, -10, 1, 0)
-        textBox.Position = UDim2.new(0, 5, 0, 0)
-        textBox.BackgroundTransparency = 1
-        textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-        textBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-        textBox.PlaceholderText = placeholderText
-        textBox.Text = ""
-        textBox.Font = Enum.Font.SourceSans
-        textBox.TextSize = 12
-        textBox.TextXAlignment = Enum.TextXAlignment.Left
-        textBox.ClearTextOnFocus = false
-        textBox.Parent = boxContainer
-
-        textBox.FocusLost:Connect(function(enterPressed)
-            callback(textBox.Text, enterPressed)
-        end)
-
-        return container
-    end
-
-    function InterfacciaEngine:AggiungiKeybind(parentTab, titleText, defaultKey, callback)
-        local container = Instance.new("Frame")
-        container.Size = UDim2.new(0.95, 0, 0, 40)
-        container.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-        container.Parent = parentTab
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 6)
-        corner.Parent = container
-
-        local titleLabel = Instance.new("TextLabel")
-        titleLabel.Size = UDim2.new(0.6, 0, 1, 0)
-        titleLabel.Position = UDim2.new(0, 10, 0, 0)
-        titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        titleLabel.Font = Enum.Font.SourceSansSemibold
-        titleLabel.TextSize = 13
-        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        titleLabel.Text = titleText
-        titleLabel.Parent = container
-
-        local bindBtn = Instance.new("TextButton")
-        bindBtn.Size = UDim2.new(0, 80, 0, 24)
-        bindBtn.Position = UDim2.new(1, -90, 0.5, -12)
-        bindBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-        bindBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
-        bindBtn.Font = Enum.Font.SourceSansBold
-        bindBtn.TextSize = 12
-        bindBtn.Text = defaultKey.Name
-        bindBtn.Parent = container
-
-        local bCorner = Instance.new("UICorner")
-        bCorner.CornerRadius = UDim.new(0, 4)
-        bCorner.Parent = bindBtn
-
-        local currentKey = defaultKey
-        local listening = false
-
-        bindBtn.MouseButton1Click:Connect(function()
-            listening = true
-            bindBtn.Text = "..."
-            bindBtn.TextColor3 = Color3.fromRGB(255, 255, 0)
-        end)
-
-        UserInputService.InputBegan:Connect(function(input, processed)
-            if processed then return end
-            if listening and input.UserInputType == Enum.UserInputType.Keyboard then
-                listening = false
-                currentKey = input.KeyCode
-                bindBtn.Text = currentKey.Name
-                bindBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
-                callback(currentKey, false)
-            elseif not listening and input.KeyCode == currentKey then
-                callback(currentKey, true)
-            end
-        end)
-
-        return container
-    end
-
-    local primoAvvio = true
-    task.spawn(function()
-        task.wait(0.2)
-        if self.primaTab and self.tabs[self.primaTab] then
-            self.tabs[self.primaTab].Visible = true
-            local btn = self.tabButtons[self.primaTab]
-            if btn then
-                btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
-                btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-            end
-        end
-    end)
-
-    return InterfacciaEngine
+if not successo or not LibreriaRemota then
+    warn("[-] Errore critico nel caricamento remoto della UI da GitHub.")
+    return
 end
 
-return Library
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+local sceneFolder = Workspace:WaitForChild("Scene", 5)
+local resourceFolder = sceneFolder and sceneFolder:WaitForChild("ResourceNodes1", 5)
+local npcFolder = Workspace:WaitForChild("NPC", 5)
+
+local rocksWorkspace = Workspace:FindFirstChild("Rocks")
+local treesWorkspace = Workspace:FindFirstChild("Trees")
+local rocksScene = sceneFolder and sceneFolder:FindFirstChild("Rocks")
+local treesScene = sceneFolder and sceneFolder:FindFirstChild("Trees")
+
+local TARGET_NAME = "ResourceNode"
+local DESIRED_SPEED = 200
+local ATTACK_DELAY = 0.05
+local CORE_LOOP_DELAY = 0.5
+local BOSS_HIT_DELAY = 0.1 
+local PVP_LOOP_DELAY = 0.05
+local FARM_TP_POSITION = Vector3.new(1546, 131, -984)
+local HITBOX_OFFSET_DIST = 3.5 
+local PORTATA_ATTACCO_FARM = 5 
+
+local SOGLIA_TOLLERANZA_SPADE = 0.50
+local SOGLIA_TOLLERANZA_SKIN = 0.50
+
+local CRATE_TYPES = {
+    "t1_wpn_crate", "t2_wpn_crate", "t3_wpn_crate",
+    "t1_skin_crate", "t2_skin_crate", "t3_skin_crate"
+}
+
+local farmMovementEnabled = false
+local farmSubMode = "EXP_ONLY" 
+local autoOpenCratesEnabled = false
+local autoEquipBestPetEnabled = false
+local autoBuyPetEnabled = false
+local autoEvolvePetsEnabled = false 
+local autoBossHitEnabled = false
+local autoDemonKingEnabled = false
+local autoHitPlayersEnabled = false
+local autoBuyArtifactCratesEnabled = false
+local autoEquipBestEnabled = false
+local autoSellWorstEnabled = false
+local cassaPetSelezionata = 1
+local cassaArtifactSelezionata = 1
+local modalitaSelezionata = "FARMING"
+
+local tpDelayAttivo = false
+
+local autoRebirthEnabled = false
+local autoBuyRebirthSkillsEnabled = false
+local livelloRebirthSelezionato = 100 
+
+local nodiBlacklist = {}
+
+local wpnInvController, skinInvController, hudController, petsUIController, artifactsUIController, sharedPetsData, sharedArtifactsData, sharedUtils
+local rebirthController
+task.spawn(function()
+    local pScripts = player:WaitForChild("PlayerScripts", 10)
+    local aero = pScripts and pScripts:WaitForChild("Aero", 10)
+    local controllers = aero and aero:WaitForChild("Controllers", 10)
+    if controllers then
+        if controllers:FindFirstChild("WeaponInventoryController") then wpnInvController = require(controllers.WeaponInventoryController) end
+        if controllers:FindFirstChild("SkinInventoryController") then skinInvController = require(controllers.SkinInventoryController) end
+        if controllers:FindFirstChild("HUDController") then hudController = require(controllers.HUDController) end
+        if controllers:FindFirstChild("PetsUIController") then petsUIController = require(controllers.PetsUIController) end
+        if controllers:FindFirstChild("ArtifactsUIController") then artifactsUIController = require(controllers.ArtifactsUIController) end
+        if controllers:FindFirstChild("RebirthController") then rebirthController = require(controllers.RebirthController) end
+        
+        if controllers:FindFirstChild("CrateOpenUIController") then
+            local crateCtrl = require(controllers.CrateOpenUIController)
+            if crateCtrl.Shared then
+                sharedPetsData = crateCtrl.Shared.Pets
+                sharedArtifactsData = crateCtrl.Shared.Artifacts or crateCtrl.Shared.ArtifactCrates
+                sharedUtils = crateCtrl.Shared.Utils
+            end
+        end
+    end
+end)
+
+local function calcolaPowerScoreSpada(item)
+    if not wpnInvController then return 0 end
+    local wpnSharedMod = wpnInvController.Shared.Weapons
+    local config = wpnSharedMod.Data[item.id]
+    if not config then return 0 end
+    local dpsBase = (wpnSharedMod:GetWeaponDamage(item) or 0) * (config.APS or 1)
+    local dpsConCritico = dpsBase * (1 + (config.Crit or 0))
+
+    if modalitaSelezionata == "FARMING" then
+        local wpnXpBoost = (wpnSharedMod.GetWeaponXp and wpnSharedMod:GetWeaponXp(item)) or (config.XpMultiplier or config.XpBoost or 0)
+        return (wpnXpBoost > 0) and ((wpnXpBoost * 10000000) + dpsConCritico) or dpsConCritico
+    end
+    return dpsConCritico
+end
+
+local function calcolaPowerScoreSkin(item)
+    if not skinInvController then return 0 end
+    local skinSharedMod = skinInvController.Shared.Skins
+    if modalitaSelezionata == "FARMING" then
+        return (skinSharedMod:GetSkinXp(item) or 0) * 10000000
+    end
+    return (skinSharedMod:GetSkinHealth(item) or 0) + ((skinSharedMod:GetSkinRegen(item) or 0) * 150)
+end
+
+local function getClosestAvailableNode(character)
+    if not resourceFolder or not character:FindFirstChild("HumanoidRootPart") then return nil, 0 end
+    local myPos = character.HumanoidRootPart.Position
+    local closestNode, shortestDistance = nil, math.huge
+    
+    local adesso = os.time()
+    for n, scadenza in pairs(nodiBlacklist) do
+        if adesso > scadenza then nodiBlacklist[n] = nil end
+    end
+
+    for _, node in ipairs(resourceFolder:GetChildren()) do
+        if node.Name == TARGET_NAME and node:IsA("BasePart") and node:FindFirstChild("Prefab") and not nodiBlacklist[node] then
+            local dist = (Vector3.new(myPos.X, 0, myPos.Z) - Vector3.new(node.Position.X, 0, node.Position.Z)).Magnitude
+            if dist < shortestDistance then shortestDistance = dist; closestNode = node end
+        end
+    end
+    return closestNode, shortestDistance
+end
+
+local function findCurrentBossTarget()
+    if not npcFolder or not npcFolder:FindFirstChild("Boss") then return nil end
+    for _, b in ipairs(npcFolder.Boss:GetChildren()) do
+        if b:IsA("Model") then return b:FindFirstChild("LowerTorso") or b:FindFirstChild("HumanoidRootPart") end
+    end
+end
+
+local function findDemonKingTarget()
+    if not npcFolder or not npcFolder:FindFirstChild("DemonKing") then return nil end
+    local dk = npcFolder.DemonKing:FindFirstChild("DemonKing")
+    return dk and (dk:FindFirstChild("LowerTorso") or dk:FindFirstChild("HumanoidRootPart"))
+end
+
+local function getSortedPlayersByDistance()
+    local list = {}
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return list end
+    local myPos = player.Character.HumanoidRootPart.Position
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChildOfClass("Humanoid") and p.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+            table.insert(list, {playerObj = p, distance = (myPos - p.Character.HumanoidRootPart.Position).Magnitude})
+        end
+    end
+    table.sort(list, function(a,b) return a.distance < b.distance end)
+    return list
+end
+
+local EngineUI = LibreriaRemota:Inizializza("Scorpion X Demo", "96045739039093", Enum.KeyCode.RightControl)
+
+LibreriaRemota:Notifica("Scorpion X", "Script partito made by Crimson_Knight", 4)
+
+local farmTab = EngineUI:CreaTab("Farm", 1)
+local petTab = EngineUI:CreaTab("Pets", 2)
+local artifactTab = EngineUI:CreaTab("Artifacts", 3)
+local itemTab = EngineUI:CreaTab("Items", 4)
+local bossTab = EngineUI:CreaTab("Boss", 5)
+local pvpTab = EngineUI:CreaTab("PvP", 6)
+local rebirthTab = EngineUI:CreaTab("Rebirth", 7)
+local settingsTab = EngineUI:CreaTab("Settings", 8)
+
+EngineUI:AggiungiSezione(farmTab, "Guide e Note")
+EngineUI:AggiungiParagrafo(farmTab, "Aggiornamento News", "Tutti i nuovi componenti come Button, Sezioni e Paragrafi dinamici sono stati unificati all'interno della struttura dell'interfaccia principale.")
+
+EngineUI:AggiungiSezione(farmTab, "Controlli Standard")
+EngineUI:AggiungiToggle(farmTab, "Auto Farm Resource", "Attiva l'attacco automatico.", farmMovementEnabled, function(v)
+    farmMovementEnabled = v
+    if v and player.Character and farmSubMode == "EXP_SHELLS" then
+        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then 
+            tpDelayAttivo = true
+            hrp.CFrame = CFrame.new(FARM_TP_POSITION) 
+            task.delay(1.5, function() tpDelayAttivo = false end)
+        end
+        player.Character.Humanoid.WalkSpeed = DESIRED_SPEED
+    end
+end)
+
+EngineUI:AggiungiDropdown(farmTab, {
+    {Text = "Only EXP (Attack)", Value = "EXP_ONLY"},
+    {Text = "EXP + Shells (Collect)", Value = "EXP_SHELLS"}
+}, "FARM SUB-MODE: Only EXP", function(modalita)
+    farmSubMode = modalita
+    if farmMovementEnabled and modalita == "EXP_SHELLS" and player.Character then
+        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then 
+            tpDelayAttivo = true
+            hrp.CFrame = CFrame.new(FARM_TP_POSITION) 
+            task.delay(1.5, function() tpDelayAttivo = false end)
+        end
+        if player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = DESIRED_SPEED
+        end
+    end
+end)
+
+EngineUI:AggiungiToggle(farmTab, "Auto Open Chests", "Apre i forzieri a terra.", autoOpenCratesEnabled, function(v) autoOpenCratesEnabled = v end)
+
+EngineUI:AggiungiSezione(petTab, "Gestione Pets")
+EngineUI:AggiungiToggle(petTab, "Auto Equip Best Pets", "Equipaggia basandosi sui moltiplicatori x reali.", autoEquipBestPetEnabled, function(v) autoEquipBestPetEnabled = v end)
+EngineUI:AggiungiToggle(petTab, "Auto Buy Pet Crate", "Compra l'uovo selezionato.", autoBuyPetEnabled, function(v) autoBuyPetEnabled = v end)
+EngineUI:AggiungiToggle(petTab, "Auto Evolve Pets", "Evolve automaticamente i pet accumulando i duplicati.", autoEvolvePetsEnabled, function(v) autoEvolvePetsEnabled = v end)
+
+EngineUI:AggiungiSezione(artifactTab, "Gestione Artefatti")
+EngineUI:AggiungiToggle(artifactTab, "Auto Equip Best Artifacts", "NOT WORKING", false, function(v) end)
+EngineUI:AggiungiToggle(artifactTab, "Auto Buy Artifact Crates", "Compra automaticamente le casse artefatto selezionate.", autoBuyArtifactCratesEnabled, function(v) autoBuyArtifactCratesEnabled = v end)
+
+EngineUI:AggiungiSezione(rebirthTab, "Configurazione Rebirth")
+EngineUI:AggiungiToggle(rebirthTab, "Auto Rebirth", "Esegue il rebirth automaticamente al livello scelto.", autoRebirthEnabled, function(v) autoRebirthEnabled = v end)
+
+EngineUI:AggiungiTextBox(rebirthTab, "Imposta Livello Rebirth", "Scrivi qui...", function(testo, inviato)
+    if inviato then
+        local numero = tonumber(testo)
+        if numero then
+            livelloRebirthSelezionato = numero
+            print("[UI] Livello minimo per Auto Rebirth impostato a:", numero)
+        end
+    end
+end)
+
+EngineUI:AggiungiToggle(rebirthTab, "Auto Buy Rebirth Skills", "Acquista e potenzia le skill rebirth disponibili.", autoBuyRebirthSkillsEnabled, function(v) autoBuyRebirthSkillsEnabled = v end)
+
+task.wait(1)
+
+local opzioniCasseDinamiche = {}
+if sharedPetsData and sharedPetsData.Crates then
+    for idCassa, infoCassa in pairs(sharedPetsData.Crates) do
+        local costoFormattato = infoCassa.Cost
+        if sharedUtils and sharedUtils.ToSuffixString then
+            costoFormattato = sharedUtils:ToSuffixString(infoCassa.Cost)
+        end
+        local valuta = infoCassa.Currency or "Gold"
+        local testoOpzione = string.format("Pet Crate ID %s (%s %s)", tostring(idCassa), tostring(costoFormattato), tostring(valuta))
+        table.insert(opzioniCasseDinamiche, {Text = testoOpzione, Value = idCassa})
+    end
+    table.sort(opzioniCasseDinamiche, function(a, b) return tonumber(a.Value) < tonumber(b.Value) end)
+else
+    opzioniCasseDinamiche = {
+        {Text = "Opzione A", Value = "A"}, {Text = "Opzione B", Value = "B"}, {Text = "Opzione C", Value = "C"}
+    }
+end
+
+EngineUI:AggiungiDropdown(petTab, opzioniCasseDinamiche, "SELEZIONA OPZIONE", function(valoreSelezionato)
+    cassaPetSelezionata = valoreSelezionato
+end)
+
+local opzioniArtifactDinamiche = {}
+if sharedArtifactsData and (sharedArtifactsData.Crates or sharedArtifactsData.Data) then
+    local sorgenteCasse = sharedArtifactsData.Crates or sharedArtifactsData.Data
+    for idCassa, infoCassa in pairs(sorgenteCasse) do
+        if type(infoCassa) == "table" and infoCassa.Cost then
+            local costoFormattato = infoCassa.Cost
+            if sharedUtils and sharedUtils.ToSuffixString then
+                costoFormattato = sharedUtils:ToSuffixString(infoCassa.Cost)
+            end
+            local valuta = infoCassa.Currency or "Shells"
+            local testoOpzione = string.format("Artifact Crate ID %s (%s %s)", tostring(idCassa), tostring(costoFormattato), tostring(valuta))
+            table.insert(opzioniArtifactDinamiche, {Text = testoOpzione, Value = idCassa})
+        end
+    end
+    table.sort(opzioniArtifactDinamiche, function(a, b) return tonumber(a.Value) < tonumber(b.Value) end)
+end
+
+if #opzioniArtifactDinamiche == 0 then
+    opzioniArtifactDinamiche = {
+        {Text = "Artifact Crate ID 1 (100 Shells)", Value = 1}, {Text = "Artifact Crate ID 2 (500 Shells)", Value = 2},
+        {Text = "Artifact Crate ID 3 (2.5K Shells)", Value = 3}, {Text = "Artifact Crate ID 4 (10K Shells)", Value = 4}
+    }
+end
+
+EngineUI:AggiungiDropdown(artifactTab, opzioniArtifactDinamiche, "SELECT ARTIFACT CRATE", function(valoreSelezionato)
+    cassaArtifactSelezionata = valoreSelezionato
+end)
+
+EngineUI:AggiungiSezione(itemTab, "Ottimizzazione Equip")
+EngineUI:AggiungiDropdown(itemTab, {
+    {Text = "FARMING (STATS EXP)", Value = "FARMING"},
+    {Text = "PVP (STATS DMG/HP)", Value = "PVP"}
+}, "TARGET MODE: FARMING", function(modalita)
+    modalitaSelezionata = modalita
+end)
+
+EngineUI:AggiungiToggle(itemTab, "Auto Equip Best Sword/Skin", "Equipaggia in base alle stats.", autoEquipBestEnabled, function(v)
+    autoEquipBestEnabled = v
+end)
+
+EngineUI:AggiungiToggle(itemTab, "Auto Clean Inv (SICURO)", "Vende i doppioni scarsi.", autoSellWorstEnabled, function(v)
+    autoSellWorstEnabled = v
+end)
+
+EngineUI:AggiungiSezione(bossTab, "Automazione Boss")
+EngineUI:AggiungiToggle(bossTab, "Auto Hit Boss", "Mantieni TP sul Boss principale.", autoBossHitEnabled, function(v) autoBossHitEnabled = v end)
+EngineUI:AggiungiToggle(bossTab, "Auto Demon King", "Mantieni TP sul Demon King.", autoDemonKingEnabled, function(v) autoDemonKingEnabled = v end)
+
+EngineUI:AggiungiSezione(pvpTab, "Combattimento PvP")
+EngineUI:AggiungiToggle(pvpTab, "Auto Hit Players", "Loop attacco sui player vicini.", autoHitPlayersEnabled, function(v) autoHitPlayersEnabled = v end)
+
+EngineUI:AggiungiSezione(settingsTab, "Scelte Rapide")
+EngineUI:AggiungiKeybind(settingsTab, "Tasto di scelta rapida", Enum.KeyCode.F, function(tasto, eStatoPremuto)
+    if eStatoPremuto then
+        print("[UI] Il Keybind impostato è stato premuto!")
+    else
+        print("[UI] Nuovo Keybind assegnato al tasto:", tasto.Name)
+    end
+end)
+
+local function setupChar(char)
+    local hum = char:WaitForChild("Humanoid", 10)
+    local hrp = char:WaitForChild("HumanoidRootPart", 10)
+    if hum and hrp and farmMovementEnabled and farmSubMode == "EXP_SHELLS" then
+        task.wait(0.1)
+        tpDelayAttivo = true
+        hrp.CFrame = CFrame.new(FARM_TP_POSITION)
+        task.delay(1.5, function() tpDelayAttivo = false end)
+        hum.WalkSpeed = DESIRED_SPEED
+    end
+    hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+        if farmMovementEnabled remission and farmSubMode == "EXP_SHELLS" and hum.WalkSpeed ~= DESIRED_SPEED then 
+            hum.WalkSpeed = DESIRED_SPEED 
+        end
+    end)
+end
+if player.Character then task.spawn(setupChar, player.Character) end
+player.CharacterAdded:Connect(function(c) task.spawn(setupChar, c) end)
+
+task.spawn(function()
+    local tempoBloccato = 0
+    local ultimoNodoAttaccato = nil
+    local timestampInizioNodo = 0
+    local randomOffset = Vector3.new(0,0,0)
+    
+    while true do
+        if farmMovementEnabled and player.Character and player.Character:FindFirstChild("Humanoid") and player.Character:FindFirstChild("HumanoidRootPart") then
+            local hum = player.Character.Humanoid
+            local hrp = player.Character.HumanoidRootPart
+            local node, dist = getClosestAvailableNode(player.Character)
+            local srv = ReplicatedStorage:FindFirstChild("Aero") and ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+            
+            if farmSubMode == "EXP_SHELLS" and node and not tpDelayAttivo then
+                if node ~= ultimoNodoAttaccato then
+                    ultimoNodoAttaccato = node
+                    timestampInizioNodo = os.time()
+                    randomOffset = Vector3.new(math.random(-12, 12)/10, 0, math.random(-12, 12)/10)
+                else
+                    if os.time() - timestampInizioNodo > 1 then
+                        nodiBlacklist[node] = os.time() + 15
+                        ultimoNodoAttaccato = nil
+                    end
+                end
+
+                local nodoPosConOffset = node.Position + randomOffset
+                local miaPos = hrp.Position
+                local distanzaPiana = (Vector3.new(miaPos.X, 0, miaPos.Z) - Vector3.new(nodoPosConOffset.X, 0, nodoPosConOffset.Z)).Magnitude
+                
+                if distanzaPiana > PORTATA_ATTACCO_FARM then
+                    hum:MoveTo(nodoPosConOffset)
+                    
+                    if hrp.AssemblyLinearVelocity.Magnitude < 3 then
+                        tempoBloccato = tempoBloccato + 0.1
+                        if tempoBloccato >= 0.4 then
+                            hum.Jump = true 
+                            tempoBloccato = 0
+                        end
+                    else
+                        tempoBloccato = 0
+                    end
+                else
+                    hum:MoveTo(miaPos)
+                    tempoBloccato = 0
+                end
+            elseif tpDelayAttivo then
+                hum:MoveTo(hrp.Position)
+                tempoBloccato = 0
+            end
+            
+            if srv then
+                srv.WeaponAttackStart:FireServer()
+                srv.WeaponAnimComplete:FireServer()
+            end
+            task.wait(ATTACK_DELAY)
+        else 
+            tempoBloccato = 0
+            ultimoNodoAttaccato = nil
+            task.wait(0.4)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if farmMovementEnabled and farmSubMode == "EXP_SHELLS" then
+            if rocksWorkspace then
+                for _, obj in ipairs(rocksWorkspace:GetDescendants()) do
+                    if obj:IsA("BasePart") then obj:Destroy() end
+                end
+            end
+            if treesWorkspace then
+                for _, obj in ipairs(treesWorkspace:GetDescendants()) do
+                    if obj:IsA("BasePart") then obj:Destroy() end
+                end
+            end
+            if rocksScene then
+                for _, obj in ipairs(rocksScene:GetDescendants()) do
+                    if obj:IsA("BasePart") then obj:Destroy() end
+                end
+            end
+            if treesScene then
+                for _, obj in ipairs(treesScene:GetDescendants()) do
+                    if obj:IsA("BasePart") then obj:Destroy() end
+                end
+            end
+            for _, obj in ipairs(Workspace:GetDescendants()) do
+                if obj:IsA("BasePart") and string.find(obj.Name, "ZLP_Build") then
+                    obj:Destroy()
+                end
+            end
+        else
+            task.wait(0.5)
+        end
+        task.wait(0.2)
+    end
+end)
+
+local function eseguiHit(targetPart)
+    local srv = ReplicatedStorage:FindFirstChild("Aero") and ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+    if srv and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local pos = targetPart.Position + (targetPart.CFrame.RightVector * HITBOX_OFFSET_DIST)
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(pos, targetPart.Position)
+        pcall(function()
+            srv.WeaponAttackStart:FireServer()
+            srv.MeleeHit:FireServer(targetPart)
+            srv.WeaponAnimComplete:FireServer()
+        end)
+    end
+end
+
+task.spawn(function()
+    while true do
+        if autoBossHitEnabled then
+            local t = findCurrentBossTarget()
+            if t then eseguiHit(t) end
+            task.wait(BOSS_HIT_DELAY)
+        elseif autoDemonKingEnabled then
+            local t = findDemonKingTarget()
+            if t then eseguiHit(t) end
+            task.wait(BOSS_HIT_DELAY)
+        else task.wait(0.2) end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        local srv = ReplicatedStorage:FindFirstChild("Aero") and ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+        if srv then
+            if autoOpenCratesEnabled and srv:FindFirstChild("OpenCrate") then
+                for _, cr in ipairs(CRATE_TYPES) do 
+                    task.spawn(function()
+                        pcall(function() srv.OpenCrate:InvokeServer(cr) end)
+                    end)
+                end
+            end
+            if autoBuyPetEnabled and srv:FindFirstChild("OpenPetCrate") then 
+                pcall(function() srv.OpenPetCrate:InvokeServer(cassaPetSelezionata, 1) end) 
+                task.wait(0.4) 
+            end
+            if autoBuyArtifactCratesEnabled and srv:FindFirstChild("OpenArtifactCrate") then 
+                pcall(function() srv.OpenArtifactCrate:InvokeServer(cassaArtifactSelezionata, 1) end) 
+                task.wait(0.4) 
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if autoHitPlayersEnabled then
+            local srv = ReplicatedStorage:FindFirstChild("Aero") and ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+            if srv then
+                for _, tgt in ipairs(getSortedPlayersByDistance()) do
+                    if not autoHitPlayersEnabled then break end
+                    local c = tgt.playerObj.Character
+                    local p = c and (c:FindFirstChildOfClass("Tool") and c:FindFirstChildOfClass("Tool"):FindFirstChild("Handle") or c:FindFirstChild("HumanoidRootPart"))
+                    if p then
+                        pcall(function()
+                            srv.WeaponAttackStart:FireServer()
+                            srv.MeleeHit:FireServer(p)
+                            srv.WeaponAnimComplete:FireServer()
+                        end)
+                    end
+                end
+            end
+            task.wait(PVP_LOOP_DELAY)
+        else task.wait(0.2) end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if autoEquipBestPetEnabled then
+            pcall(function()
+                local uiCtrl = player.PlayerScripts.Aero.Controllers:FindFirstChild("PetsUIController")
+                local srv = ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+                if uiCtrl and srv then
+                    local data = require(uiCtrl)
+                    local list = {}
+                    local petsShared = data.Shared and data.Shared.Pets
+
+                    for uid, info in pairs(data.Data) do
+                        local totalMultiplier = 0
+                        if petsShared and petsShared.GetXpBoost then
+                            local xpB = petsShared:GetXpBoost(info.ptype, info.level, info.evo) or 1
+                            local spB = petsShared.GetSpeedBoost and petsShared:GetSpeedBoost(info.ptype, info.level, info.evo) or 1
+                            local glB = petsShared.GetGoldBoost and petsShared:GetGoldBoost(info.ptype, info.level, info.evo) or 1
+                            totalMultiplier = xpB + spB + glB
+                        else
+                            totalMultiplier = (info.evo or 0) * 10 + (info.level or 1)
+                        end
+
+                        table.insert(list, {
+                            uid = uid, 
+                            power = totalMultiplier, 
+                            eq = info.equipped or false
+                        })
+                    end
+
+                    table.sort(list, function(a,b) return a.power > b.power end)
+
+                    local slots = 2
+                    if data.MaxPets and data.FourMaxPets then
+                        if data.MaxPets.Value == true then slots = slots + 2 end
+                        if data.FourMaxPets.Value == true then slots = slots + 4 end
+                    end
+                    if data.PetEquipSlotsRef then slots = data.PetEquipSlotsRef.Value end
+
+                    for i, pet in ipairs(list) do
+                        if i <= slots then
+                            if not pet.eq then 
+                                srv.RequestEquipPet:InvokeServer(pet.uid, true) 
+                                task.wait(0.08) 
+                            end
+                        else
+                            if pet.eq then 
+                                srv.RequestEquipPet:InvokeServer(pet.uid, false) 
+                                task.wait(0.08) 
+                            end
+                        end
+                    end
+                end
+            end)
+            task.wait(3.0)
+        else task.wait(1.0) end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if autoEvolvePetsEnabled and petsUIController and petsUIController.Data then
+            pcall(function()
+                local srv = ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+                local sharedConstants = petsUIController.Shared and petsUIController.Shared.SharedConstants
+                if srv and sharedConstants then
+                    local reqCount = sharedConstants.REQUIRED_PET_EVOLVE_COUNT or 4
+                    local maxEvo = sharedConstants.MAX_PET_EVOLUTIONS or 5
+
+                    local petGruppi = {}
+                    for uid, pet in pairs(petsUIController.Data) do
+                        if not pet.locked and not pet.equipped and (pet.evo or 0) < maxEvo then
+                            if not petGruppi[pet.ptype] then petGruppi[pet.ptype] = {} end
+                            table.insert(petGruppi[pet.ptype], uid)
+                        end
+                    end
+
+                    for ptype, uids in pairs(petGruppi) do
+                        if #uids >= (reqCount + 1) then
+                            local mainPet = uids[1]
+                            local materialePets = {}
+                            for i = 2, (reqCount + 1) do
+                                table.insert(materialePets, uids[i])
+                            end
+
+                            local successoEvo = srv.EvolvePet:InvokeServer(mainPet, materialePets)
+                            if successoEvo then
+                                task.wait(0.5)
+                            end
+                            break 
+                        end
+                    end
+                end
+            end)
+            task.wait(2.0)
+        else
+            task.wait(1.0)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        local srv = ReplicatedStorage:FindFirstChild("Aero") and ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+        if srv and hudController then
+            local lvl = hudController:GetPlayerLevel()
+            
+            if wpnInvController and wpnInvController.InventoryData then
+                local spadeValide = {}
+                for uid, item in pairs(wpnInvController.InventoryData) do
+                    if item.level <= lvl then
+                        table.insert(spadeValide, {uid = uid, score = calcolaPowerScoreSpada(item)})
+                    end
+                end
+                
+                table.sort(spadeValide, function(a, b) return a.score > b.score end)
+                
+                local primaMigliore = spadeValide[1] and spadeValide[1].uid or nil
+                local secondaMigliore = spadeValide[2] and spadeValide[2].uid or nil
+                
+                if autoEquipBestEnabled then
+                    if primaMigliore and primaMigliore ~= wpnInvController.EquippedWeapon then 
+                        srv.EquipWeapon:FireServer(primaMigliore) 
+                        task.wait(0.1)
+                    end
+                    
+                    if secondaMigliore and secondaMigliore ~= wpnInvController.Offhand_EquippedWpn and srv:FindFirstChild("EquipOffhand") then
+                        srv.EquipOffhand:FireServer(secondaMigliore)
+                        task.wait(0.1)
+                    end
+                end
+                
+                if autoSellWorstEnabled and wpnInvController.EquippedWeapon and srv:FindFirstChild("SellWeapon") then
+                    local act = calcolaPowerScoreSpada(wpnInvController.InventoryData[wpnInvController.EquippedWeapon])
+                    for uid, item in pairs(wpnInvController.InventoryData) do
+                        if uid ~= wpnInvController.EquippedWeapon and uid ~= wpnInvController.Offhand_EquippedWpn then
+                            if not (item.upgrades and item.upgrades > 0) and calcolaPowerScoreSpada(item) < (act * SOGLIA_TOLLERANZA_SPADE) then
+                                srv.SellWeapon:InvokeServer(uid) task.wait(0.05)
+                            end
+                        end
+                    end
+                end
+            end
+            
+            if skinInvController and skinInvController.InventoryData then
+                local best, high = nil, -1
+                for uid, item in pairs(skinInvController.InventoryData) do
+                    if item.level <= lvl then
+                        local sc = calcolaPowerScoreSkin(item)
+                        if sc > high then high = sc; best = uid end
+                    end
+                end
+                if autoEquipBestEnabled and best and best ~= skinInvController.EquippedSkin then
+                    srv[skinInvController.Shared.SharedConstants.RemoteEvents.EQUIP_SKIN or "EQUIP_SKIN"]:FireServer(best)
+                end
+                if autoSellWorstEnabled and skinInvController.EquippedSkin and srv:FindFirstChild("SellSkin") then
+                    local act = calcolaPowerScoreSkin(skinInvController.InventoryData[skinInvController.EquippedSkin])
+                    for uid, item in pairs(skinInvController.InventoryData) do
+                        if uid ~= skinInvController.EquippedSkin then
+                            if not (item.upgrades and item.upgrades > 0) and calcolaPowerScoreSkin(item) < (act * SOGLIA_TOLLERANZA_SKIN) then
+                                srv.SellSkin:InvokeServer(uid) task.wait(0.05)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(CORE_LOOP_DELAY)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if autoRebirthEnabled then
+            pcall(function()
+                local clientData = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("ClientData")
+                local stats = clientData and clientData:FindFirstChild("stats")
+                local level = stats and stats:FindFirstChild("level")
+                
+                if level and level.Value >= livelloRebirthSelezionato then
+                    local srv = ReplicatedStorage:FindFirstChild("Aero") and ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+                    if srv and srv:FindFirstChild("RebirthRequest") then
+                        srv.RebirthRequest:InvokeServer()
+                    end
+                end
+            end)
+            task.wait(1.0)
+        else
+            task.wait(1.0)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if autoBuyRebirthSkillsEnabled and rebirthController and rebirthController.SkillsData then
+            pcall(function()
+                local srv = ReplicatedStorage.Aero.AeroRemoteServices:FindFirstChild("GameService")
+                local clientData = player.PlayerGui:FindFirstChild("ClientData")
+                local tokens = clientData and clientData.stats:FindFirstChild("tokens")
+                local constants = rebirthController.Constants or rebirthController.Shared.SharedConstants
+
+                if srv and tokens and constants then
+                    for idSkill, datiSkill in ipairs(rebirthController.SkillsData) do
+                        local keySkill = datiSkill.skill
+                        local rankAttuale = datiSkill.rank
+                        local reqSkillId = datiSkill.reqSkill
+                        local rankReqSkill = reqSkillId and rebirthController.SkillsData[reqSkillId] and rebirthController.SkillsData[reqSkillId].rank or 0
+                        local skillRequisito = constants:GetRequiredSkill(keySkill)
+
+                        local puoPotenziare = constants:CanUpgradeSkill(keySkill, rankAttuale, skillRequisito, rankReqSkill)
+                        local costo = constants:GetSkillUpgradeCost(keySkill, rankAttuale)
+
+                        if idSkill == 6 and rankAttuale > 0 then
+                            puoPotenziare = false
+                        end
+
+                        if puoPotenziare and tokens.Value >= costo then
+                            srv.UpgradeSkill:InvokeServer(keySkill)
+                            task.wait(0.2)
+                        end
+                    end
+                end
+            end)
+            task.wait(1.5)
+        else
+            task.wait(1.0)
+        end
+    end
+end)
+
+print("[+] Scorpion X Hub - Loader Eseguito con Successo!")
+
