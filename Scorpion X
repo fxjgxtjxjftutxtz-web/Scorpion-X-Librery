@@ -1,7 +1,48 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (VERSIONE COMPLETA AGGIORNATA)
+-- SCORPION X - UI LIBRARY ENGINE (VERSIONE COMPLETA AGGIORNATA & STABILIZZATA)
 -- =============================================================================
 local Library = {}
+
+-- Funzione di utilità interna per rendere gli elementi trascinabili in modo fluido
+local function RendiTrascinabile(Frame, DragArea)
+    local UserInputService = game:GetService("UserInputService")
+    local TweenService = game:GetService("TweenService")
+    
+    DragArea = DragArea or Frame
+    local dragging, dragInput, dragStart, startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        local targetPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        TweenService:Create(Frame, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+    end
+
+    DragArea.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    DragArea.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
+end
 
 function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local Players = game:GetService("Players")
@@ -30,7 +71,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
     MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     MainFrame.Active = true
-    MainFrame.Draggable = true 
     MainFrame.Visible = true
     MainFrame.Parent = ScreenGui
 
@@ -43,6 +83,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0)
     UIStrokeFrame.Parent = MainFrame
 
+    -- TOPBAR
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Size = UDim2.new(1, 0, 0, 35)
@@ -53,9 +94,35 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     TopBarCorner.CornerRadius = UDim.new(0, 10)
     TopBarCorner.Parent = TopBar
 
+    -- ICONA NELL'ANGOLO DELLA TOPBAR
+    local TopBarIcon
+    if idIconaPulsante and idIconaPulsante ~= "" then
+        local pulitoID = tostring(idIconaPulsante):match("%d+")
+        TopBarIcon = Instance.new("ImageLabel")
+        TopBarIcon.Image = "rbxassetid://" .. pulitoID
+        TopBarIcon.ScaleType = Enum.ScaleType.Crop
+        TopBarIcon.BackgroundTransparency = 1
+    else
+        TopBarIcon = Instance.new("TextLabel")
+        TopBarIcon.Text = "SCO X"
+        TopBarIcon.TextColor3 = Color3.fromRGB(150, 255, 0)
+        TopBarIcon.Font = Enum.Font.SourceSansBold
+        TopBarIcon.TextSize = 12
+        TopBarIcon.BackgroundTransparency = 1
+    end
+    TopBarIcon.Name = "TopBarIcon"
+    TopBarIcon.Size = UDim2.new(0, 22, 0, 22)
+    TopBarIcon.Position = UDim2.new(0, 10, 0.5, -11)
+    TopBarIcon.Parent = TopBar
+
+    local TopBarIconCorner = Instance.new("UICorner")
+    TopBarIconCorner.CornerRadius = UDim.new(1, 0)
+    TopBarIconCorner.Parent = TopBarIcon
+
+    -- TITOLO HUB (Spostato a destra per fare spazio all'icona)
     local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -20, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+    TitleLabel.Size = UDim2.new(1, -50, 1, 0)
+    TitleLabel.Position = UDim2.new(0, 40, 0, 0)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     TitleLabel.Font = Enum.Font.SourceSansBold
@@ -63,6 +130,9 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Text = tostring(titoloHub):upper()
     TitleLabel.Parent = TopBar
+
+    -- Attiva il drag fluido sulla barra superiore
+    RendiTrascinabile(MainFrame, TopBar)
 
     -- PULSANTE FLUTTUANTE (Apertura/Chiusura)
     local ToggleMenuBtn
@@ -85,8 +155,10 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     ToggleMenuBtn.Size = UDim2.new(0, 50, 0, 50)
     ToggleMenuBtn.Position = UDim2.new(0, 20, 0.3, 0)
     ToggleMenuBtn.Active = true
-    ToggleMenuBtn.Draggable = true 
     ToggleMenuBtn.Parent = ScreenGui
+
+    -- Rendi trascinabile anche il pulsante fluttuante
+    RendiTrascinabile(ToggleMenuBtn)
 
     local UICornerBtn = Instance.new("UICorner")
     UICornerBtn.CornerRadius = UDim.new(1, 0)
@@ -115,7 +187,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     SideBar.Size = UDim2.new(0, 130, 0, 285)
     SideBar.Position = UDim2.new(0, 10, 0, 45)
     SideBar.BackgroundTransparency = 1
-    SideBar.CanvasSize = UDim2.new(0, 0, 0, 400)
+    SideBar.CanvasSize = UDim2.new(0, 0, 0, 0)
     SideBar.ScrollBarThickness = 0
     SideBar.Parent = MainFrame
 
@@ -123,6 +195,10 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     SideBarList.Padding = UDim.new(0, 5)
     SideBarList.SortOrder = Enum.SortOrder.LayoutOrder
     SideBarList.Parent = SideBar
+    
+    SideBarList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        SideBar.CanvasSize = UDim2.new(0, 0, 0, SideBarList.AbsoluteContentSize.Y + 10)
+    end)
 
     -- CONTENT CONTAINER
     local ContentContainer = Instance.new("Frame")
@@ -202,7 +278,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         end)
     end
 
-    -- STRUTTURA: CREA TAB
+    -- STRUTTURA: CREA TAB (Senza icone, allineamento pulito)
     function InterfacciaEngine:CreaTab(name, order)
         local contentFrame = Instance.new("ScrollingFrame")
         contentFrame.Name = name .. "Tab"
@@ -225,7 +301,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
             contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 20)
         end)
 
-        self.tabs[name] = contentFrame
+        InterfacciaEngine.tabs[name] = contentFrame
 
         local tabBtn = Instance.new("TextButton")
         tabBtn.Size = UDim2.new(0, 120, 0, 32)
@@ -233,9 +309,9 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         tabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
         tabBtn.Font = Enum.Font.SourceSansSemibold
         tabBtn.TextSize = 13
-        tabBtn.Text = "  " .. name
-        tabBtn.TextXAlignment = Enum.TextXAlignment.Left
-        tabBtn.LayoutOrder = order
+        tabBtn.Text = name -- Rimosse icone e spaziature asimmetriche
+        tabBtn.TextXAlignment = Enum.TextXAlignment.Center -- Allineamento centrato e pulito
+        tabBtn.LayoutOrder = order or 0
         tabBtn.Parent = SideBar
 
         local btnCorner = Instance.new("UICorner")
@@ -247,18 +323,18 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         btnStroke.Color = Color3.fromRGB(40, 40, 40)
         btnStroke.Parent = tabBtn
 
-        if not self.primaTab then self.primaTab = name end
+        if not InterfacciaEngine.primaTab then InterfacciaEngine.primaTab = name end
 
         tabBtn.MouseButton1Click:Connect(function()
-            if self.activeDropdownFrame then
-                self.activeDropdownFrame.Visible = false
-                self.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
-                self.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
-                self.activeDropdownFrame = nil
-                self.activeDropdownContainer = nil
+            if InterfacciaEngine.activeDropdownFrame then
+                InterfacciaEngine.activeDropdownFrame.Visible = false
+                InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
+                InterfacciaEngine.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                InterfacciaEngine.activeDropdownFrame = nil
+                InterfacciaEngine.activeDropdownContainer = nil
             end
-            for tName, frame in pairs(self.tabs) do frame.Visible = (tName == name) end
-            for bName, btn in pairs(self.tabButtons) do
+            for tName, frame in pairs(InterfacciaEngine.tabs) do frame.Visible = (tName == name) end
+            for bName, btn in pairs(InterfacciaEngine.tabButtons) do
                 if bName == name then
                     btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
                     btn.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -269,7 +345,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
             end
         end)
 
-        self.tabButtons[name] = tabBtn
+        InterfacciaEngine.tabButtons[name] = tabBtn
         return contentFrame
     end
 
@@ -506,7 +582,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
             opt.TextColor3 = Color3.fromRGB(255, 255, 255)
             opt.Font = Enum.Font.SourceSans
             opt.TextSize = 12
-            opt.Text = "   " .. tostring(val.Text or val)
+            opt.Text = "    " .. tostring(val.Text or val)
             opt.TextXAlignment = Enum.TextXAlignment.Left
             opt.LayoutOrder = i
             opt.Parent = dropListFrame
@@ -744,12 +820,12 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- AUTO-OPEN FIRST TAB
+    -- APERTURA AUTOMATICA PRIMA TAB CORRETTA
     task.spawn(function()
         task.wait(0.2)
-        if self.primaTab and self.tabs[self.primaTab] then
-            self.tabs[self.primaTab].Visible = true
-            local btn = self.tabButtons[self.primaTab]
+        if InterfacciaEngine.primaTab and InterfacciaEngine.tabs[InterfacciaEngine.primaTab] then
+            InterfacciaEngine.tabs[InterfacciaEngine.primaTab].Visible = true
+            local btn = InterfacciaEngine.tabButtons[InterfacciaEngine.primaTab]
             if btn then
                 btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
                 btn.TextColor3 = Color3.fromRGB(0, 0, 0)
