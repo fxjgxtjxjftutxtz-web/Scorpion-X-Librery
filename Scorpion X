@@ -91,18 +91,24 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local UICornerBtn = Instance.new("UICorner"); UICornerBtn.CornerRadius = UDim.new(1, 0); UICornerBtn.Parent = ToggleMenuBtn
     local UIStrokeBtn = Instance.new("UIStroke"); UIStrokeBtn.Thickness = 1.5; UIStrokeBtn.Color = VerdeTema; UIStrokeBtn.Parent = ToggleMenuBtn
 
-    -- [SISTEMATO] Icona perfettamente centrata e ridimensionata all'interno del cerchio
+    -- [MODIFICATO PER FARE IL 100%]
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
         local BtnIcon = Instance.new("ImageLabel")
         BtnIcon.Name = "BtnIcon"
         BtnIcon.Image = "rbxassetid://" .. pulitoID
-        BtnIcon.Size = UDim2.new(0.8, 0, 1, 0) -- Occupa l'80% dello spazio interno del pulsante
-        BtnIcon.Position = UDim2.new(0.1, 0, 0.1, 0) -- Allineamento perfetto al centro
+        BtnIcon.Size = UDim2.new(1, 0, 1, 0) -- Copre al 100% la larghezza e l'altezza
+        BtnIcon.Position = UDim2.new(0, 0, 0, 0) -- Parte dall'angolo in alto a sinistra esatto
         BtnIcon.BackgroundTransparency = 1
-        BtnIcon.ScaleType = Enum.ScaleType.Fit
+        BtnIcon.ScaleType = Enum.ScaleType.Fit -- Mantiene le proporzioni reali dell'immagine
         BtnIcon.Parent = ToggleMenuBtn
         ToggleMenuBtn.Text = ""
+        
+        -- Consiglio: se l'immagine inserita è quadrata ed esce dai bordi tondi,
+        -- questo UICorner taglierà anche l'immagine facendola diventare tonda al 100%
+        local BtnIconCorner = Instance.new("UICorner")
+        BtnIconCorner.CornerRadius = UDim.new(1, 0)
+        BtnIconCorner.Parent = BtnIcon
     else
         ToggleMenuBtn.Text = "SCO X"
         ToggleMenuBtn.TextColor3 = VerdeTema
