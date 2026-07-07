@@ -1,15 +1,13 @@
 -- =============================================================================
--- SCORPION X - EMERALD CYBER EDITION (PREMIUM UI ENGINE)
+-- SCORPION X - EMERALD CYBER EDITION (PREMIUM UI ENGINE - FIXED TABS)
 -- =============================================================================
 local Library = {}
 
--- Utility interna per animazioni veloci
 local TweenService = game:GetService("TweenService")
 local function ApplicaTween(istanza, tempo, proprieta)
     TweenService:Create(istanza, TweenInfo.new(tempo, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), proprieta):Play()
 end
 
--- Funzione di utilità interna per rendere gli elementi trascinabili in modo fluido
 local function RendiTrascinabile(Frame, DragArea)
     local UserInputService = game:GetService("UserInputService")
     DragArea = DragArea or Frame
@@ -55,11 +53,9 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
 
-    -- Colore Tema: Verde Smeraldo Scuro Premium
     local VerdeTema = Color3.fromRGB(0, 180, 100)
     local VerdeTemaHover = Color3.fromRGB(0, 140, 75)
 
-    -- Rimozione vecchie istanze
     local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
     if oldGui then oldGui:Destroy() end
 
@@ -71,7 +67,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local successo = pcall(function() ScreenGui.Parent = CoreGui end)
     if not successo then ScreenGui.Parent = playerGui end
 
-    -- MAIN FRAME
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Size = UDim2.new(0, 540, 0, 360)
@@ -90,7 +85,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     UIStrokeFrame.Color = Color3.fromRGB(35, 35, 40)
     UIStrokeFrame.Parent = MainFrame
 
-    -- TOPBAR
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
     TopBar.Size = UDim2.new(1, 0, 0, 40)
@@ -141,7 +135,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 
     RendiTrascinabile(MainFrame, TopBar)
 
-    -- PULSANTE FLUTTUANTE
     local ToggleMenuBtn
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
@@ -186,7 +179,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         end
     end)
 
-    -- SIDEBAR
     local SideBar = Instance.new("ScrollingFrame")
     SideBar.Name = "SideBar"
     SideBar.Size = UDim2.new(0, 140, 0, 300)
@@ -205,7 +197,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         SideBar.CanvasSize = UDim2.new(0, 0, 0, SideBarList.AbsoluteContentSize.Y + 10)
     end)
 
-    -- CONTENT CONTAINER
     local ContentContainer = Instance.new("Frame")
     ContentContainer.Name = "ContentContainer"
     ContentContainer.Size = UDim2.new(0, 365, 0, 300)
@@ -215,7 +206,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 
     local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil, activeDropdownButton = nil, activeDropdownText = "" }
 
-    -- FUNZIONE: NOTIFICA TOAST
     function Library:Notifica(titolo, messaggio, durata)
         durata = durata or 4
         local NotificationStorage = ScreenGui:FindFirstChild("NotificationStorage")
@@ -291,7 +281,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         end)
     end
 
-    -- STRUTTURA: CREA TAB
     function InterfacciaEngine:CreaTab(name, order)
         local contentFrame = Instance.new("ScrollingFrame")
         contentFrame.Name = name .. "Tab"
@@ -335,7 +324,14 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         btnStroke.Color = Color3.fromRGB(26, 26, 28)
         btnStroke.Parent = tabBtn
 
-        if not InterfacciaEngine.primaTab then InterfacciaEngine.primaTab = name end
+        -- FORZA l'apertura se è la prima tab assoluta
+        if not InterfacciaEngine.primaTab then 
+            InterfacciaEngine.primaTab = name 
+            contentFrame.Visible = true
+            tabBtn.BackgroundColor3 = Color3.fromRGB(16, 26, 22)
+            tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            btnStroke.Color = VerdeTema
+        end
 
         tabBtn.MouseEnter:Connect(function()
             if InterfacciaEngine.tabButtons[name].TextColor3 ~= Color3.fromRGB(255, 255, 255) then
@@ -374,7 +370,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return contentFrame
     end
 
-    -- SEZIONE
     function InterfacciaEngine:AggiungiSezione(parentTab, text)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 28)
@@ -401,7 +396,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- PARAGRAFO
     function InterfacciaEngine:AggiungiParagrafo(parentTab, titoloTesto, corpoTesto)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 60)
@@ -448,7 +442,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- ELEMENTO: BUTTON (Emerald Cyber Redesign)
     function InterfacciaEngine:AggiungiButton(parentTab, text, callback)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(0.95, 0, 0, 34)
@@ -485,7 +478,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return btn
     end
 
-    -- ELEMENTO: TOGGLE (Emerald Cyber Redesign)
     function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 48)
@@ -575,7 +567,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- ELEMENTO: DROPDOWN (Con triangolo dinamico aperto/chiuso e tema smeraldo)
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
         local currentSelectedText = defaultText
         
@@ -687,7 +678,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         end)
     end
 
-    -- ELEMENTO: SLIDER
     function InterfacciaEngine:AggiungiSlider(parentTab, titleText, min, max, default, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 52)
@@ -770,7 +760,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- ELEMENTO: TEXTBOX
     function InterfacciaEngine:AggiungiTextBox(parentTab, titleText, placeholderText, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 45)
@@ -830,7 +819,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- ELEMENTO: KEYBIND
     function InterfacciaEngine:AggiungiKeybind(parentTab, titleText, defaultKey, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 42)
@@ -897,20 +885,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 
         return container
     end
-
-    -- APERTURA AUTOMATICA PRIMA TAB
-    task.spawn(function()
-        task.wait(0.2)
-        if InterfacciaEngine.primaTab and InterfacciaEngine.tabs[InterfacciaEngine.primaTab] then
-            InterfacciaEngine.tabs[InterfacciaEngine.primaTab].Visible = true
-            local btn = InterfacciaEngine.tabButtons[InterfacciaEngine.primaTab]
-            if btn then
-                btn.BackgroundColor3 = Color3.fromRGB(16, 26, 22)
-                btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                btn.UIStroke.Color = VerdeTema
-            end
-        end
-    end)
 
     return InterfacciaEngine
 end
