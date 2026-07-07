@@ -55,25 +55,61 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local TopBarCorner = Instance.new("UICorner"); TopBarCorner.CornerRadius = UDim.new(0, 12); TopBarCorner.Parent = TopBar
     local TopBarLine = Instance.new("Frame"); TopBarLine.Size = UDim2.new(1, 0, 0, 1); TopBarLine.Position = UDim2.new(0, 0, 1, -1); TopBarLine.BackgroundColor3 = Color3.fromRGB(28, 28, 30); TopBarLine.BorderSizePixel = 0; TopBarLine.Parent = TopBar
 
-    local TopBarIcon
+    -- Gestione Icona Menu Principale (TopBar)
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
-        TopBarIcon = Instance.new("ImageLabel"); TopBarIcon.Image = "rbxassetid://" .. pulitoID; TopBarIcon.ScaleType = Enum.ScaleType.Crop; TopBarIcon.BackgroundTransparency = 1
+        local TopBarIcon = Instance.new("ImageLabel")
+        TopBarIcon.Name = "TopBarIcon"
+        TopBarIcon.Image = "rbxassetid://" .. pulitoID
+        TopBarIcon.Size = UDim2.new(0, 24, 0, 24)
+        TopBarIcon.Position = UDim2.new(0, 12, 0.5, -12)
+        TopBarIcon.BackgroundTransparency = 1
+        TopBarIcon.ScaleType = Enum.ScaleType.Fit
+        TopBarIcon.Parent = TopBar
     else
-        TopBarIcon = Instance.new("TextLabel"); TopBarIcon.Text = "⚡"; TopBarIcon.TextColor3 = VerdeTema; TopBarIcon.Font = Enum.Font.SourceSansBold; TopBarIcon.TextSize = 14; TopBarIcon.BackgroundTransparency = 1
+        local TopBarTextIcon = Instance.new("TextLabel")
+        TopBarTextIcon.Name = "TopBarIcon"
+        TopBarTextIcon.Text = "⚡"
+        TopBarTextIcon.TextColor3 = VerdeTema
+        TopBarTextIcon.Font = Enum.Font.SourceSansBold
+        TopBarTextIcon.TextSize = 16
+        TopBarTextIcon.Size = UDim2.new(0, 24, 0, 24)
+        TopBarTextIcon.Position = UDim2.new(0, 12, 0.5, -12)
+        TopBarTextIcon.BackgroundTransparency = 1
+        TopBarTextIcon.Parent = TopBar
     end
-    TopBarIcon.Name = "TopBarIcon"; TopBarIcon.Size = UDim2.new(0, 22, 0, 22); TopBarIcon.Position = UDim2.new(0, 12, 0.5, -11); TopBarIcon.Parent = TopBar
 
     local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -60, 1, 0); TitleLabel.Position = UDim2.new(0, 42, 0, 0); TitleLabel.BackgroundTransparency = 1; TitleLabel.TextColor3 = Color3.fromRGB(245, 245, 245); TitleLabel.Font = Enum.Font.GothamBold; TitleLabel.TextSize = 13; TitleLabel.TextXAlignment = Enum.TextXAlignment.Left; TitleLabel.Text = tostring(titoloHub):upper(); TitleLabel.Parent = TopBar
+    TitleLabel.Size = UDim2.new(1, -60, 1, 0); TitleLabel.Position = UDim2.new(0, 45, 0, 0); TitleLabel.BackgroundTransparency = 1; TitleLabel.TextColor3 = Color3.fromRGB(245, 245, 245); TitleLabel.Font = Enum.Font.GothamBold; TitleLabel.TextSize = 13; TitleLabel.TextXAlignment = Enum.TextXAlignment.Left; TitleLabel.Text = tostring(titoloHub):upper(); TitleLabel.Parent = TopBar
 
     RendiTrascinabile(MainFrame, TopBar)
 
+    -- Pulsante Mobile
     local ToggleMenuBtn = Instance.new("TextButton")
-    ToggleMenuBtn.Name = "ToggleMenuBtn"; ToggleMenuBtn.Size = UDim2.new(0, 46, 0, 46); ToggleMenuBtn.Position = UDim2.new(0, 20, 0.15, 0); ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(16, 16, 18); ToggleMenuBtn.Text = "SCO X"; ToggleMenuBtn.TextColor3 = VerdeTema; ToggleMenuBtn.Font = Enum.Font.GothamBold; ToggleMenuBtn.TextSize = 12; ToggleMenuBtn.Active = true; ToggleMenuBtn.Parent = ScreenGui
+    ToggleMenuBtn.Name = "ToggleMenuBtn"; ToggleMenuBtn.Size = UDim2.new(0, 46, 0, 46); ToggleMenuBtn.Position = UDim2.new(0, 20, 0.15, 0); ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(16, 16, 18); ToggleMenuBtn.Active = true; ToggleMenuBtn.Parent = ScreenGui
     RendiTrascinabile(ToggleMenuBtn)
     local UICornerBtn = Instance.new("UICorner"); UICornerBtn.CornerRadius = UDim.new(1, 0); UICornerBtn.Parent = ToggleMenuBtn
     local UIStrokeBtn = Instance.new("UIStroke"); UIStrokeBtn.Thickness = 1.5; UIStrokeBtn.Color = VerdeTema; UIStrokeBtn.Parent = ToggleMenuBtn
+
+    -- Gestione Icona sul Pulsante Mobile
+    if idIconaPulsante and idIconaPulsante ~= "" then
+        local pulitoID = tostring(idIconaPulsante):match("%d+")
+        local BtnIcon = Instance.new("ImageLabel")
+        BtnIcon.Name = "BtnIcon"
+        BtnIcon.Image = "rbxassetid://" .. pulitoID
+        BtnIcon.Size = UDim2.new(0, 28, 0, 28)
+        BtnIcon.Position = UDim2.new(0.5, -14, 0.5, -14)
+        BtnIcon.BackgroundTransparency = 1
+        BtnIcon.ScaleType = Enum.ScaleType.Fit
+        BtnIcon.Parent = ToggleMenuBtn
+        ToggleMenuBtn.Text = "" -- Rimuove il testo se c'è l'immagine
+    else
+        ToggleMenuBtn.Text = "SCO X"
+        ToggleMenuBtn.TextColor3 = VerdeTema
+        ToggleMenuBtn.Font = Enum.Font.GothamBold
+        ToggleMenuBtn.TextSize = 11
+    end
+
     ToggleMenuBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
 
     local menuBind = tastoChiusuraDefault or Enum.KeyCode.RightControl
@@ -90,7 +126,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil, activeDropdownButton = nil, activeDropdownText = "" }
 
     function InterfacciaEngine:Notifica(titolo, messaggio, durata)
-        durata = durata or 4
+        durata = duration or 4
         local NotificationStorage = ScreenGui:FindFirstChild("NotificationStorage") or Instance.new("Frame")
         if not NotificationStorage.Parent then
             NotificationStorage.Name = "NotificationStorage"; NotificationStorage.Size = UDim2.new(0, 260, 0, 400); NotificationStorage.Position = UDim2.new(1, -280, 1, -420); NotificationStorage.BackgroundTransparency = 1; NotificationStorage.Parent = ScreenGui
