@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - UI LIBRARY ENGINE (VERSIONE COMPLETA AGGIORNATA)
+-- SCORPION X - UI LIBRARY ENGINE (VERSIONE COMPLETA)
 -- =============================================================================
 
 local Library = {}
@@ -141,7 +141,9 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         activeDropdownFrame = nil 
     }
 
-    -- FUNZIONE: NOTIFICA
+    ---------------------------------------------------------------------------
+    -- NOTIFICA
+    ---------------------------------------------------------------------------
     function Library:Notifica(titolo, messaggio, durata)
         durata = durata or 4
         local NotificationStorage = ScreenGui:FindFirstChild("NotificationStorage")
@@ -209,7 +211,168 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         end)
     end
 
-    return InterfacciaEngine
-end
+    ---------------------------------------------------------------------------
+    -- CREA TAB
+    ---------------------------------------------------------------------------
+    function InterfacciaEngine:CreaTab(name, order)
+        local contentFrame = Instance.new("ScrollingFrame")
+        contentFrame.Name = name .. "Tab"
+        contentFrame.Size = UDim2.new(1, 0, 1, 0)
+        contentFrame.BackgroundTransparency = 1
+        contentFrame.CanvasSize = UDim2.new(0, 0, 0, 500)
+        contentFrame.ScrollBarThickness = 3
+        contentFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 255, 0)
+        contentFrame.Visible = false
+        contentFrame.ClipsDescendants = true
+        contentFrame.Parent = ContentContainer
 
-return Library
+        local listLayout = Instance.new("UIListLayout")
+        listLayout.Padding = UDim.new(0, 6)
+        listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        listLayout.Parent = contentFrame
+
+        listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 20)
+        end)
+
+        self.tabs[name] = contentFrame
+
+        local tabBtn = Instance.new("TextButton")
+        tabBtn.Size = UDim2.new(0, 120, 0, 32)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        tabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+        tabBtn.Font = Enum.Font.SourceSansSemibold
+        tabBtn.TextSize = 13
+        tabBtn.Text = "  " .. name
+        tabBtn.TextXAlignment = Enum.TextXAlignment.Left
+        tabBtn.LayoutOrder = order
+        tabBtn.Parent = SideBar
+
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 6)
+        btnCorner.Parent = tabBtn
+        
+        local btnStroke = Instance.new("UIStroke")
+        btnStroke.Thickness = 1
+        btnStroke.Color = Color3.fromRGB(40, 40, 40)
+        btnStroke.Parent = tabBtn
+
+        if not self.primaTab then self.primaTab = name end
+
+        tabBtn.MouseButton1Click:Connect(function()
+            if self.activeDropdownFrame then
+                self.activeDropdownFrame.Visible = false
+                self.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
+                self.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                self.activeDropdownFrame = nil
+                self.activeDropdownContainer = nil
+            end
+
+            for tName, frame in pairs(self.tabs) do
+                frame.Visible = (tName == name)
+            end
+
+            for bName, btn in pairs(self.tabButtons) do
+                if bName == name then
+                    btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
+                    btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+                else
+                    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                    btn.TextColor3 = Color3.fromRGB(180, 180, 180)
+                end
+            end
+        end)
+
+        self.tabButtons[name] = tabBtn
+        return contentFrame
+    end
+
+    ---------------------------------------------------------------------------
+    -- AGGIUNGI SEZIONE
+    ---------------------------------------------------------------------------
+    function InterfacciaEngine:AggiungiSezione(parentTab, text)
+        local container = Instance.new("Frame")
+        container.Size = UDim2.new(0.95, 0, 0, 25)
+        container.BackgroundTransparency = 1
+        container.Parent = parentTab
+
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.TextColor3 = Color3.fromRGB(150, 255, 0)
+        label.Font = Enum.Font.SourceSansBold
+        label.TextSize = 11
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Text = "—— " .. text:upper() .. " ——"
+        label.Parent = container
+
+        return container
+    end
+
+    ---------------------------------------------------------------------------
+    -- AGGIUNGI PARAGRAFO
+    ---------------------------------------------------------------------------
+    function InterfacciaEngine:AggiungiParagrafo(parentTab, titoloTesto, corpoTesto)
+        local container = Instance.new("Frame")
+        container.Size = UDim2.new(0.95, 0, 0, 60)
+        container.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        container.Parent = parentTab
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 6)
+        corner.Parent = container
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Thickness = 1
+        stroke.Color = Color3.fromRGB(40, 40, 40)
+        stroke.Parent = container
+
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(1, -20, 0, 20)
+        titleLabel.Position = UDim2.new(0, 10, 0, 5)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
+        titleLabel.Font = Enum.Font.SourceSansBold
+        titleLabel.TextSize = 12
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.Text = titoloTesto:upper()
+        titleLabel.Parent = container
+
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(1, -20, 1, -25)
+        textLabel.Position = UDim2.new(0, 10, 0, 22)
+        textLabel.BackgroundTransparency = 1
+        textLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        textLabel.Font = Enum.Font.SourceSans
+        textLabel.TextSize = 11
+        textLabel.TextWrapped = true
+        textLabel.TextXAlignment = Enum.TextXAlignment.Left
+        textLabel.TextYAlignment = Enum.TextYAlignment.Top
+        textLabel.Text = corpoTesto
+        textLabel.Parent = container
+
+        textLabel:GetPropertyChangedSignal("TextBounds"):Connect(function()
+            container.Size = UDim2.new(0.95, 0, 0, textLabel.TextBounds.Y + 35)
+        end)
+
+        return container
+    end
+
+    ---------------------------------------------------------------------------
+    -- AGGIUNGI BUTTON
+    ---------------------------------------------------------------------------
+    function InterfacciaEngine:AggiungiButton(parentTab, text, callback)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0.95, 0, 0, 32)
+        btn.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.Font = Enum.Font.SourceSansSemibold
+        btn.TextSize = 13
+        btn.Text = text
+        btn.Parent = parentTab
+
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 6)
+        btnCorner.Parent = btn
+        
