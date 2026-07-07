@@ -97,7 +97,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         local BtnIcon = Instance.new("ImageLabel")
         BtnIcon.Name = "BtnIcon"
         BtnIcon.Image = "rbxassetid://" .. pulitoID
-        BtnIcon.Size = UDim2.new(0.8, 0, 0.8, 0) -- Occupa l'80% dello spazio interno del pulsante
+        BtnIcon.Size = UDim2.new(0.8, 0, 1, 0) -- Occupa l'80% dello spazio interno del pulsante
         BtnIcon.Position = UDim2.new(0.1, 0, 0.1, 0) -- Allineamento perfetto al centro
         BtnIcon.BackgroundTransparency = 1
         BtnIcon.ScaleType = Enum.ScaleType.Fit
