@@ -1,230 +1,215 @@
--- ScorpionX UI Library
+-- =============================================================================
+-- SCORPION X - UI LIBRARY ENGINE (VERSIONE COMPLETA AGGIORNATA)
+-- =============================================================================
+
 local Library = {}
-Library.__index = Library
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
+    local Players = game:GetService("Players")
+    local CoreGui = game:GetService("CoreGui")
+    local UserInputService = game:GetService("UserInputService")
+    local TweenService = game:GetService("TweenService")
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
 
-function Library:MakeWindow(cfg)
-    local gui = Instance.new("ScreenGui")
-    gui.Name = cfg.Title or "ScorpionX"
-    gui.ResetOnSpawn = false
-    gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    -- Rimozione vecchie istanze
+    local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
+    if oldGui then oldGui:Destroy() end
 
-    local window = Instance.new("Frame")
-    window.Size = UDim2.new(0, 520, 0, 360)
-    window.Position = UDim2.new(0.5, -260, 0.5, -180)
-    window.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    window.Parent = gui
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "ScorpioXMenu"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.DisplayOrder = 100
 
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 32)
-    title.BackgroundTransparency = 1
-    title.Text = (cfg.Title or "Window") .. " - " .. (cfg.SubTitle or "")
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 18
-    title.Parent = window
+    local successo = pcall(function() ScreenGui.Parent = CoreGui end)
+    if not successo then ScreenGui.Parent = playerGui end
 
-    local tabHolder = Instance.new("Frame")
-    tabHolder.Size = UDim2.new(0, 130, 1, -40)
-    tabHolder.Position = UDim2.new(0, 5, 0, 40)
-    tabHolder.BackgroundTransparency = 1
-    tabHolder.Parent = window
+    -- MAIN FRAME
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 520, 0, 340)
+    MainFrame.Position = UDim2.new(0.5, -260, 0.5, -170)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    MainFrame.Active = true
+    MainFrame.Draggable = true 
+    MainFrame.Visible = true
+    MainFrame.Parent = ScreenGui
 
-    local contentHolder = Instance.new("Frame")
-    contentHolder.Size = UDim2.new(1, -140, 1, -40)
-    contentHolder.Position = UDim2.new(0, 135, 0, 40)
-    contentHolder.BackgroundTransparency = 1
-    contentHolder.Parent = window
+    local UICornerFrame = Instance.new("UICorner")
+    UICornerFrame.CornerRadius = UDim.new(0, 10)
+    UICornerFrame.Parent = MainFrame
 
-    local WindowObj = {
-        Tabs = {},
-        TabHolder = tabHolder,
-        ContentHolder = contentHolder
-    }
+    local UIStrokeFrame = Instance.new("UIStroke")
+    UIStrokeFrame.Thickness = 1.5
+    UIStrokeFrame.Color = Color3.fromRGB(150, 255, 0)
+    UIStrokeFrame.Parent = MainFrame
 
-    function WindowObj:MakeTab(cfg)
-        local tabButton = Instance.new("TextButton")
-        tabButton.Size = UDim2.new(1, 0, 0, 32)
-        tabButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        tabButton.Font = Enum.Font.Gotham
-        tabButton.TextSize = 14
-        tabButton.Text = cfg.Title or "Tab"
-        tabButton.Parent = self.TabHolder
+    local TopBar = Instance.new("Frame")
+    TopBar.Name = "TopBar"
+    TopBar.Size = UDim2.new(1, 0, 0, 35)
+    TopBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+    TopBar.Parent = MainFrame
 
-        local tabContent = Instance.new("ScrollingFrame")
-        tabContent.Size = UDim2.new(1, 0, 1, 0)
-        tabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
-        tabContent.BackgroundTransparency = 1
-        tabContent.Visible = false
-        tabContent.Parent = self.ContentHolder
+    local TopBarCorner = Instance.new("UICorner")
+    TopBarCorner.CornerRadius = UDim.new(0, 10)
+    TopBarCorner.Parent = TopBar
 
-        local layout = Instance.new("UIListLayout")
-        layout.Padding = UDim.new(0, 6)
-        layout.Parent = tabContent
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Size = UDim2.new(1, -20, 1, 0)
+    TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TitleLabel.Font = Enum.Font.SourceSansBold
+    TitleLabel.TextSize = 14
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.Text = tostring(titoloHub):upper()
+    TitleLabel.Parent = TopBar
 
-        local TabObj = {
-            Button = tabButton,
-            Content = tabContent
-        }
-
-        function TabObj:Select()
-            for _, t in pairs(WindowObj.Tabs) do
-                t.Content.Visible = false
-                t.Button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-            end
-            self.Content.Visible = true
-            self.Button.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-        end
-
-        function TabObj:AddSection(name)
-            local SectionObj = {}
-
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1, -10, 0, 24)
-            label.BackgroundTransparency = 1
-            label.Text = name or "Section"
-            label.TextColor3 = Color3.fromRGB(255, 255, 255)
-            label.Font = Enum.Font.GothamBold
-            label.TextSize = 16
-            label.Parent = tabContent
-
-            function SectionObj:AddButton(cfg)
-                local btn = Instance.new("TextButton")
-                btn.Size = UDim2.new(1, -10, 0, 28)
-                btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-                btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                btn.Font = Enum.Font.Gotham
-                btn.TextSize = 14
-                btn.Text = cfg.Name or "Button"
-                btn.Parent = tabContent
-
-                btn.MouseButton1Click:Connect(function()
-                    if cfg.Callback then cfg.Callback() end
-                end)
-            end
-
-            function SectionObj:AddToggle(cfg)
-                local frame = Instance.new("Frame")
-                frame.Size = UDim2.new(1, -10, 0, 28)
-                frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-                frame.Parent = tabContent
-
-                local label = Instance.new("TextLabel")
-                label.Size = UDim2.new(0.7, 0, 1, 0)
-                label.BackgroundTransparency = 1
-                label.Text = cfg.Name or "Toggle"
-                label.TextColor3 = Color3.fromRGB(255, 255, 255)
-                label.Font = Enum.Font.Gotham
-                label.TextSize = 14
-                label.Parent = frame
-
-                local button = Instance.new("TextButton")
-                button.Size = UDim2.new(0.25, 0, 0.7, 0)
-                button.Position = UDim2.new(0.72, 0, 0.15, 0)
-                button.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-                button.Text = "OFF"
-                button.TextColor3 = Color3.fromRGB(255, 255, 255)
-                button.Font = Enum.Font.GothamBold
-                button.TextSize = 14
-                button.Parent = frame
-
-                local state = cfg.Default or false
-
-                local function update()
-                    if state then
-                        button.BackgroundColor3 = Color3.fromRGB(0, 80, 0)
-                        button.Text = "ON"
-                    else
-                        button.BackgroundColor3 = Color3.fromRGB(80, 0, 0)
-                        button.Text = "OFF"
-                    end
-                end
-
-                update()
-
-                button.MouseButton1Click:Connect(function()
-                    state = not state
-                    update()
-                    if cfg.Callback then cfg.Callback(state) end
-                end)
-            end
-
-            function SectionObj:AddSlider(cfg)
-                local frame = Instance.new("Frame")
-                frame.Size = UDim2.new(1, -10, 0, 40)
-                frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-                frame.Parent = tabContent
-
-                local label = Instance.new("TextLabel")
-                label.Size = UDim2.new(1, 0, 0, 18)
-                label.BackgroundTransparency = 1
-                label.Text = cfg.Name or "Slider"
-                label.TextColor3 = Color3.fromRGB(255, 255, 255)
-                label.Font = Enum.Font.Gotham
-                label.TextSize = 14
-                label.Parent = frame
-
-                local bar = Instance.new("Frame")
-                bar.Size = UDim2.new(1, -10, 0, 10)
-                bar.Position = UDim2.new(0, 5, 0, 22)
-                bar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-                bar.Parent = frame
-
-                local fill = Instance.new("Frame")
-                fill.Size = UDim2.new(0, 0, 1, 0)
-                fill.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-                fill.Parent = bar
-
-                local min = cfg.Min or 0
-                local max = cfg.Max or 100
-                local value = cfg.Default or min
-
-                local function setValue(v)
-                    v = math.clamp(v, min, max)
-                    value = v
-                    fill.Size = UDim2.new((v - min) / (max - min), 0, 1, 0)
-                    label.Text = cfg.Name .. " (" .. math.floor(v) .. ")"
-                    if cfg.Callback then cfg.Callback(v) end
-                end
-
-                setValue(value)
-
-                local uis = game:GetService("UserInputService")
-                local dragging = false
-
-                bar.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        dragging = true
-                    end
-                end)
-
-                bar.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        dragging = false
-                    end
-                end)
-
-                uis.InputChanged:Connect(function(input)
-                    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                        local rel = (input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X
-                        setValue(min + (max - min) * rel)
-                    end
-                end)
-            end
-
-            return SectionObj
-        end
-
-        table.insert(WindowObj.Tabs, TabObj)
-        if #WindowObj.Tabs == 1 then TabObj:Select() end
-
-        return TabObj
+    -- PULSANTE FLUTTUANTE
+    local ToggleMenuBtn
+    if idIconaPulsante and idIconaPulsante ~= "" then
+        local pulitoID = tostring(idIconaPulsante):match("%d+")
+        ToggleMenuBtn = Instance.new("ImageButton")
+        ToggleMenuBtn.Image = "rbxassetid://" .. pulitoID
+        ToggleMenuBtn.ScaleType = Enum.ScaleType.Crop
+        ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    else
+        ToggleMenuBtn = Instance.new("TextButton")
+        ToggleMenuBtn.Text = "SCO X"
+        ToggleMenuBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
+        ToggleMenuBtn.Font = Enum.Font.SourceSansBold
+        ToggleMenuBtn.TextSize = 14
+        ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     end
 
-    return WindowObj
+    ToggleMenuBtn.Name = "ToggleMenuBtn"
+    ToggleMenuBtn.Size = UDim2.new(0, 50, 0, 50)
+    ToggleMenuBtn.Position = UDim2.new(0, 20, 0.3, 0)
+    ToggleMenuBtn.Active = true
+    ToggleMenuBtn.Draggable = true 
+    ToggleMenuBtn.Parent = ScreenGui
+
+    local UICornerBtn = Instance.new("UICorner")
+    UICornerBtn.CornerRadius = UDim.new(1, 0)
+    UICornerBtn.Parent = ToggleMenuBtn
+
+    local UIStrokeBtn = Instance.new("UIStroke")
+    UIStrokeBtn.Thickness = 1.5
+    UIStrokeBtn.Color = Color3.fromRGB(150, 255, 0)
+    UIStrokeBtn.Parent = ToggleMenuBtn
+
+    ToggleMenuBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = not MainFrame.Visible
+    end)
+
+    -- CHIUSURA DA TASTIERA
+    local menuBind = tastoChiusuraDefault or Enum.KeyCode.RightControl
+    UserInputService.InputBegan:Connect(function(input, processed)
+        if not processed and input.KeyCode == menuBind then
+            MainFrame.Visible = not MainFrame.Visible
+        end
+    end)
+
+    -- SIDEBAR
+    local SideBar = Instance.new("ScrollingFrame")
+    SideBar.Name = "SideBar"
+    SideBar.Size = UDim2.new(0, 130, 0, 285)
+    SideBar.Position = UDim2.new(0, 10, 0, 45)
+    SideBar.BackgroundTransparency = 1
+    SideBar.CanvasSize = UDim2.new(0, 0, 0, 400)
+    SideBar.ScrollBarThickness = 0
+    SideBar.Parent = MainFrame
+
+    local SideBarList = Instance.new("UIListLayout")
+    SideBarList.Padding = UDim.new(0, 5)
+    SideBarList.SortOrder = Enum.SortOrder.LayoutOrder
+    SideBarList.Parent = SideBar
+
+    -- CONTENT CONTAINER
+    local ContentContainer = Instance.new("Frame")
+    ContentContainer.Name = "ContentContainer"
+    ContentContainer.Size = UDim2.new(0, 360, 0, 285)
+    ContentContainer.Position = UDim2.new(0, 150, 0, 45)
+    ContentContainer.BackgroundTransparency = 1
+    ContentContainer.Parent = MainFrame
+
+    local InterfacciaEngine = { 
+        tabs = {}, 
+        tabButtons = {}, 
+        primaTab = nil, 
+        activeDropdownContainer = nil, 
+        activeDropdownFrame = nil 
+    }
+
+    -- FUNZIONE: NOTIFICA
+    function Library:Notifica(titolo, messaggio, durata)
+        durata = durata or 4
+        local NotificationStorage = ScreenGui:FindFirstChild("NotificationStorage")
+        if not NotificationStorage then
+            NotificationStorage = Instance.new("Frame")
+            NotificationStorage.Name = "NotificationStorage"
+            NotificationStorage.Size = UDim2.new(0, 250, 0, 400)
+            NotificationStorage.Position = UDim2.new(1, -260, 1, -410)
+            NotificationStorage.BackgroundTransparency = 1
+            NotificationStorage.Parent = ScreenGui
+
+            local layout = Instance.new("UIListLayout")
+            layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+            layout.Padding = UDim.new(0, 8)
+            layout.Parent = NotificationStorage
+        end
+
+        local NotifFrame = Instance.new("Frame")
+        NotifFrame.Size = UDim2.new(1, 0, 0, 60)
+        NotifFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        NotifFrame.Parent = NotificationStorage
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 6)
+        corner.Parent = NotifFrame
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Thickness = 1
+        stroke.Color = Color3.fromRGB(150, 255, 0)
+        stroke.Parent = NotifFrame
+
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(1, -20, 0, 20)
+        titleLabel.Position = UDim2.new(0, 10, 0, 5)
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
+        titleLabel.Font = Enum.Font.SourceSansBold
+        titleLabel.TextSize = 13
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.Text = titolo:upper()
+        titleLabel.Parent = NotifFrame
+
+        local msgLabel = Instance.new("TextLabel")
+        msgLabel.Size = UDim2.new(1, -20, 0, 30)
+        msgLabel.Position = UDim2.new(0, 10, 0, 22)
+        msgLabel.BackgroundTransparency = 1
+        msgLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        msgLabel.Font = Enum.Font.SourceSans
+        msgLabel.TextSize = 12
+        msgLabel.TextWrapped = true
+        msgLabel.TextXAlignment = Enum.TextXAlignment.Left
+        msgLabel.TextYAlignment = Enum.TextYAlignment.Top
+        msgLabel.Text = messaggio
+        msgLabel.Parent = NotifFrame
+
+        task.spawn(function()
+            task.wait(durata)
+            local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            TweenService:Create(NotifFrame, info, {BackgroundTransparency = 1}):Play()
+            TweenService:Create(titleLabel, info, {TextTransparency = 1}):Play()
+            TweenService:Create(msgLabel, info, {TextTransparency = 1}):Play()
+            local sTween = TweenService:Create(stroke, info, {Transparency = 1})
+            sTween:Play()
+            sTween.Completed:Connect(function() NotifFrame:Destroy() end)
+        end)
+    end
+
+    return InterfacciaEngine
 end
 
 return Library
