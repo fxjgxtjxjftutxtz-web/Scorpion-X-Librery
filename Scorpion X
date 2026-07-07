@@ -55,7 +55,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local TopBarCorner = Instance.new("UICorner"); TopBarCorner.CornerRadius = UDim.new(0, 12); TopBarCorner.Parent = TopBar
     local TopBarLine = Instance.new("Frame"); TopBarLine.Size = UDim2.new(1, 0, 0, 1); TopBarLine.Position = UDim2.new(0, 0, 1, -1); TopBarLine.BackgroundColor3 = Color3.fromRGB(28, 28, 30); TopBarLine.BorderSizePixel = 0; TopBarLine.Parent = TopBar
 
-    -- [CORREZIONE] Gestione Icona TopBar
+    -- Gestione Icona TopBar
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
         local TopBarIcon = Instance.new("ImageLabel")
@@ -84,21 +84,21 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 
     RendiTrascinabile(MainFrame, TopBar)
 
-    -- Pulsante Mobile
+    -- Pulsante Mobile (Sfondo Rotondo)
     local ToggleMenuBtn = Instance.new("TextButton")
     ToggleMenuBtn.Name = "ToggleMenuBtn"; ToggleMenuBtn.Size = UDim2.new(0, 46, 0, 46); ToggleMenuBtn.Position = UDim2.new(0, 20, 0.15, 0); ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(16, 16, 18); ToggleMenuBtn.Active = true; ToggleMenuBtn.Parent = ScreenGui
     RendiTrascinabile(ToggleMenuBtn)
     local UICornerBtn = Instance.new("UICorner"); UICornerBtn.CornerRadius = UDim.new(1, 0); UICornerBtn.Parent = ToggleMenuBtn
     local UIStrokeBtn = Instance.new("UIStroke"); UIStrokeBtn.Thickness = 1.5; UIStrokeBtn.Color = VerdeTema; UIStrokeBtn.Parent = ToggleMenuBtn
 
-    -- [CORREZIONE] Gestione Icona Pulsante Mobile
+    -- [SISTEMATO] Icona perfettamente centrata e ridimensionata all'interno del cerchio
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
         local BtnIcon = Instance.new("ImageLabel")
         BtnIcon.Name = "BtnIcon"
         BtnIcon.Image = "rbxassetid://" .. pulitoID
-        BtnIcon.Size = UDim2.new(0, 28, 0, 28)
-        BtnIcon.Position = UDim2.new(0.5, -14, 0.5, -14)
+        BtnIcon.Size = UDim2.new(0.8, 0, 0.8, 0) -- Occupa l'80% dello spazio interno del pulsante
+        BtnIcon.Position = UDim2.new(0.1, 0, 0.1, 0) -- Allineamento perfetto al centro
         BtnIcon.BackgroundTransparency = 1
         BtnIcon.ScaleType = Enum.ScaleType.Fit
         BtnIcon.Parent = ToggleMenuBtn
