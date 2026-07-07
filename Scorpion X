@@ -12,7 +12,7 @@ local function RendiTrascinabile(Frame, DragArea)
     local function update(input)
         local delta = input.Position - dragStart
         local targetPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        ApplicaTween(Frame, 0.1, {Position = targetPos})
+        ApplicaTween(Frame, 0.12, {Position = targetPos})
     end
     DragArea.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -31,191 +31,156 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
 
-    local ColoreSfondo = Color3.fromRGB(20, 20, 22)
-    local ColoreTopBar = Color3.fromRGB(24, 24, 26)
-    local ColoreElemento = Color3.fromRGB(28, 28, 30)
-    local ColoreTestoPrincipale = Color3.fromRGB(240, 240, 245)
-    local ColoreTestoSecondario = Color3.fromRGB(150, 150, 155)
-    local ColoreAccento = Color3.fromRGB(80, 110, 240)
+    local VerdeTema = Color3.fromRGB(0, 180, 100)
+    local VerdeTemaHover = Color3.fromRGB(0, 140, 75)
 
     local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
     if oldGui then oldGui:Destroy() end
 
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ScorpioXMenu"; ScreenGui.ResetOnSpawn = false; ScreenGui.DisplayOrder = 100
+    ScreenGui.Name = "ScorpioXMenu"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.DisplayOrder = 100
     pcall(function() ScreenGui.Parent = CoreGui end)
     if not ScreenGui.Parent then ScreenGui.Parent = playerGui end
 
-    local NotificationHolder = ScreenGui:FindFirstChild("NotificationHolder")
-    if not NotificationHolder then
-        NotificationHolder = Instance.new("Frame")
-        NotificationHolder.Name = "NotificationHolder"
-        NotificationHolder.Size = UDim2.new(0, 300, 1, -20)
-        NotificationHolder.Position = UDim2.new(1, -310, 0, 10)
-        NotificationHolder.BackgroundTransparency = 1
-        NotificationHolder.Parent = ScreenGui
-        local notifList = Instance.new("UIListLayout")
-        notifList.VerticalAlignment = Enum.VerticalAlignment.Bottom
-        notifList.Padding = UDim.new(0, 8)
-        notifList.Parent = NotificationHolder
-    end
-
-    function Library:Notifica(titolo, messaggio, durata)
-        durata = durata or 4
-        local notif = Instance.new("Frame")
-        notif.Size = UDim2.new(1, 0, 0, 60)
-        notif.BackgroundColor3 = ColoreTopBar
-        notif.BackgroundTransparency = 1
-        notif.Parent = NotificationHolder
-        
-        local nCorner = Instance.new("UICorner"); nCorner.CornerRadius = UDim.new(0, 8); nCorner.Parent = notif
-        local nStroke = Instance.new("UIStroke"); nStroke.Color = ColoreElemento; nStroke.Thickness = 1.2; nStroke.Parent = notif
-        
-        local nBar = Instance.new("Frame")
-        nBar.Size = UDim2.new(0, 4, 1, 0); nBar.BackgroundColor3 = ColoreAccento; nBar.Parent = notif
-        local nbCorner = Instance.new("UICorner"); nbCorner.Parent = nBar
-
-        local nTitle = Instance.new("TextLabel")
-        nTitle.Size = UDim2.new(1, -20, 0, 20); nTitle.Position = UDim2.new(0, 12, 0, 5); nTitle.BackgroundTransparency = 1
-        nTitle.TextColor3 = ColoreTestoPrincipale; nTitle.Font = Enum.Font.GothamBold; nTitle.TextSize = 13; nTitle.TextXAlignment = Enum.TextXAlignment.Left; nTitle.Text = titolo; nTitle.Parent = notif
-
-        local nDesc = Instance.new("TextLabel")
-        nDesc.Size = UDim2.new(1, -20, 1, -28); nDesc.Position = UDim2.new(0, 12, 0, 23); nDesc.BackgroundTransparency = 1
-        nDesc.TextColor3 = ColoreTestoSecondario; nDesc.Font = Enum.Font.Gotham; nDesc.TextSize = 11; nDesc.TextXAlignment = Enum.TextXAlignment.Left; nDesc.TextWrapped = true; nDesc.Text = messaggio; nDesc.Parent = notif
-
-        ApplicaTween(notif, 0.3, {BackgroundTransparency = 0})
-        task.delay(durata, function()
-            ApplicaTween(notif, 0.3, {BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 0)})
-            ApplicaTween(nTitle, 0.3, {TextTransparency = 1})
-            ApplicaTween(nDesc, 0.3, {TextTransparency = 1})
-            ApplicaTween(nBar, 0.3, {BackgroundTransparency = 1})
-            task.wait(0.3)
-            notif:Destroy()
-        end)
-    end
-
     local MainFrame = Instance.new("Frame")
-    MainFrame.Name = "MainFrame"; MainFrame.Size = UDim2.new(0, 600, 0, 380); MainFrame.Position = UDim2.new(0.5, -300, 0.5, -190); MainFrame.BackgroundColor3 = ColoreSfondo; MainFrame.Active = true; MainFrame.Parent = ScreenGui
-    local UICornerFrame = Instance.new("UICorner"); UICornerFrame.CornerRadius = UDim.new(0, 10); UICornerFrame.Parent = MainFrame
-    local UIStrokeFrame = Instance.new("UIStroke"); UIStrokeFrame.Thickness = 1.5; UIStrokeFrame.Color = Color3.fromRGB(35, 35, 38); UIStrokeFrame.Parent = MainFrame
+    MainFrame.Name = "MainFrame"; MainFrame.Size = UDim2.new(0, 540, 0, 360); MainFrame.Position = UDim2.new(0.5, -270, 0.5, -180); MainFrame.BackgroundColor3 = Color3.fromRGB(11, 11, 12); MainFrame.Active = true; MainFrame.Visible = true; MainFrame.Parent = ScreenGui
+
+    local UICornerFrame = Instance.new("UICorner"); UICornerFrame.CornerRadius = UDim.new(0, 12); UICornerFrame.Parent = MainFrame
+    local UIStrokeFrame = Instance.new("UIStroke"); UIStrokeFrame.Thickness = 1.2; UIStrokeFrame.Color = Color3.fromRGB(35, 35, 40); UIStrokeFrame.Parent = MainFrame
 
     local TopBar = Instance.new("Frame")
-    TopBar.Name = "TopBar"; TopBar.Size = UDim2.new(1, 0, 0, 38); TopBar.BackgroundColor3 = ColoreTopBar; TopBar.Parent = MainFrame
-    local TopBarCorner = Instance.new("UICorner"); TopBarCorner.CornerRadius = UDim.new(0, 10); TopBarCorner.Parent = TopBar
-    
+    TopBar.Name = "TopBar"; TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundColor3 = Color3.fromRGB(16, 16, 18); TopBar.Parent = MainFrame
+    local TopBarCorner = Instance.new("UICorner"); TopBarCorner.CornerRadius = UDim.new(0, 12); TopBarCorner.Parent = TopBar
+    local TopBarLine = Instance.new("Frame"); TopBarLine.Size = UDim2.new(1, 0, 0, 1); TopBarLine.Position = UDim2.new(0, 0, 1, -1); TopBarLine.BackgroundColor3 = Color3.fromRGB(28, 28, 30); TopBarLine.BorderSizePixel = 0; TopBarLine.Parent = TopBar
+
+    -- Gestione Icona TopBar
+    if idIconaPulsante and idIconaPulsante ~= "" then
+        local pulitoID = tostring(idIconaPulsante):match("%d+")
+        local TopBarIcon = Instance.new("ImageLabel")
+        TopBarIcon.Name = "TopBarIcon"
+        TopBarIcon.Image = "rbxassetid://" .. pulitoID
+        TopBarIcon.Size = UDim2.new(0, 24, 0, 24)
+        TopBarIcon.Position = UDim2.new(0, 12, 0.5, -12)
+        TopBarIcon.BackgroundTransparency = 1
+        TopBarIcon.ScaleType = Enum.ScaleType.Fit
+        TopBarIcon.Parent = TopBar
+    else
+        local TopBarTextIcon = Instance.new("TextLabel")
+        TopBarTextIcon.Name = "TopBarIcon"
+        TopBarTextIcon.Text = "⚡"
+        TopBarTextIcon.TextColor3 = VerdeTema
+        TopBarTextIcon.Font = Enum.Font.SourceSansBold
+        TopBarTextIcon.TextSize = 16
+        TopBarTextIcon.Size = UDim2.new(0, 24, 0, 24)
+        TopBarTextIcon.Position = UDim2.new(0, 12, 0.5, -12)
+        TopBarTextIcon.BackgroundTransparency = 1
+        TopBarTextIcon.Parent = TopBar
+    end
+
     local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -100, 1, 0); TitleLabel.Position = UDim2.new(0, 15, 0, 0); TitleLabel.BackgroundTransparency = 1; TitleLabel.TextColor3 = ColoreTestoPrincipale; TitleLabel.Font = Enum.Font.GothamMedium; TitleLabel.TextSize = 13; TitleLabel.TextXAlignment = Enum.TextXAlignment.Left; TitleLabel.Text = titoloHub; TitleLabel.Parent = TopBar
+    TitleLabel.Size = UDim2.new(1, -60, 1, 0); TitleLabel.Position = UDim2.new(0, 45, 0, 0); TitleLabel.BackgroundTransparency = 1; TitleLabel.TextColor3 = Color3.fromRGB(245, 245, 245); TitleLabel.Font = Enum.Font.GothamBold; TitleLabel.TextSize = 13; TitleLabel.TextXAlignment = Enum.TextXAlignment.Left; TitleLabel.Text = tostring(titoloHub):upper(); TitleLabel.Parent = TopBar
 
     RendiTrascinabile(MainFrame, TopBar)
 
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Size = UDim2.new(0, 30, 0, 38); CloseBtn.Position = UDim2.new(1, -35, 0, 0); CloseBtn.BackgroundTransparency = 1; CloseBtn.Text = "✕"; CloseBtn.TextColor3 = ColoreTestoSecondario; CloseBtn.Font = Enum.Font.GothamBold; CloseBtn.TextSize = 14; CloseBtn.Parent = TopBar
-    CloseBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
-
+    -- Pulsante Mobile (Sfondo Rotondo)
     local ToggleMenuBtn = Instance.new("TextButton")
-    ToggleMenuBtn.Name = "ToggleMenuBtn"; ToggleMenuBtn.Size = UDim2.new(0, 46, 0, 46); ToggleMenuBtn.Position = UDim2.new(0, 20, 0.15, 0); ToggleMenuBtn.BackgroundColor3 = ColoreTopBar; ToggleMenuBtn.Parent = ScreenGui
+    ToggleMenuBtn.Name = "ToggleMenuBtn"; ToggleMenuBtn.Size = UDim2.new(0, 46, 0, 46); ToggleMenuBtn.Position = UDim2.new(0, 20, 0.15, 0); ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(16, 16, 18); ToggleMenuBtn.Active = true; ToggleMenuBtn.Parent = ScreenGui
     RendiTrascinabile(ToggleMenuBtn)
     local UICornerBtn = Instance.new("UICorner"); UICornerBtn.CornerRadius = UDim.new(1, 0); UICornerBtn.Parent = ToggleMenuBtn
-    local UIStrokeBtn = Instance.new("UIStroke"); UIStrokeBtn.Thickness = 1.5; UIStrokeBtn.Color = ColoreAccento; UIStrokeBtn.Parent = ToggleMenuBtn
+    local UIStrokeBtn = Instance.new("UIStroke"); UIStrokeBtn.Thickness = 1.5; UIStrokeBtn.Color = VerdeTema; UIStrokeBtn.Parent = ToggleMenuBtn
 
+    -- [MODIFICATO PER FARE IL 100%]
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
         local BtnIcon = Instance.new("ImageLabel")
-        BtnIcon.Image = "rbxassetid://" .. pulitoID; BtnIcon.Size = UDim2.new(1, 0, 1, 0); BtnIcon.BackgroundTransparency = 1; BtnIcon.ScaleType = Enum.ScaleType.Fit; BtnIcon.Parent = ToggleMenuBtn
-        local BtnIconCorner = Instance.new("UICorner"); BtnIconCorner.CornerRadius = UDim.new(1, 0); BtnIconCorner.Parent = BtnIcon
+        BtnIcon.Name = "BtnIcon"
+        BtnIcon.Image = "rbxassetid://" .. pulitoID
+        BtnIcon.Size = UDim2.new(1, 0, 1, 0) -- Copre al 100% la larghezza e l'altezza
+        BtnIcon.Position = UDim2.new(0, 0, 0, 0) -- Parte dall'angolo in alto a sinistra esatto
+        BtnIcon.BackgroundTransparency = 1
+        BtnIcon.ScaleType = Enum.ScaleType.Fit -- Mantiene le proporzioni reali dell'immagine
+        BtnIcon.Parent = ToggleMenuBtn
         ToggleMenuBtn.Text = ""
+        
+        -- Consiglio: se l'immagine inserita è quadrata ed esce dai bordi tondi,
+        -- questo UICorner taglierà anche l'immagine facendola diventare tonda al 100%
+        local BtnIconCorner = Instance.new("UICorner")
+        BtnIconCorner.CornerRadius = UDim.new(1, 0)
+        BtnIconCorner.Parent = BtnIcon
     else
-        ToggleMenuBtn.Text = "REDZ"; ToggleMenuBtn.TextColor3 = ColoreAccento; ToggleMenuBtn.Font = Enum.Font.GothamBold; ToggleMenuBtn.TextSize = 10
+        ToggleMenuBtn.Text = "SCO X"
+        ToggleMenuBtn.TextColor3 = VerdeTema
+        ToggleMenuBtn.Font = Enum.Font.GothamBold
+        ToggleMenuBtn.TextSize = 11
     end
+
     ToggleMenuBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
 
     local menuBind = tastoChiusuraDefault or Enum.KeyCode.RightControl
     UserInputService.InputBegan:Connect(function(input, processed) if not processed and input.KeyCode == menuBind then MainFrame.Visible = not MainFrame.Visible end end)
 
     local SideBar = Instance.new("ScrollingFrame")
-    SideBar.Name = "SideBar"; SideBar.Size = UDim2.new(0, 160, 1, -48); SideBar.Position = UDim2.new(0, 8, 0, 42); SideBar.BackgroundTransparency = 1; SideBar.ScrollBarThickness = 0; SideBar.Parent = MainFrame
-    local SideBarList = Instance.new("UIListLayout"); SideBarList.Padding = UDim.new(0, 5); SideBarList.SortOrder = Enum.SortOrder.LayoutOrder; SideBarList.Parent = SideBar
+    SideBar.Name = "SideBar"; SideBar.Size = UDim2.new(0, 140, 0, 300); SideBar.Position = UDim2.new(0, 12, 0, 50); SideBar.BackgroundTransparency = 1; SideBar.CanvasSize = UDim2.new(0, 0, 0, 0); SideBar.ScrollBarThickness = 0; SideBar.Parent = MainFrame
+    local SideBarList = Instance.new("UIListLayout"); SideBarList.Padding = UDim.new(0, 6); SideBarList.SortOrder = Enum.SortOrder.LayoutOrder; SideBarList.Parent = SideBar
+    SideBarList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() SideBar.CanvasSize = UDim2.new(0, 0, 0, SideBarList.AbsoluteContentSize.Y + 10) end)
 
     local ContentContainer = Instance.new("Frame")
-    ContentContainer.Name = "ContentContainer"; ContentContainer.Size = UDim2.new(1, -182, 1, -48); ContentContainer.Position = UDim2.new(0, 174, 0, 42); ContentContainer.BackgroundTransparency = 1; ContentContainer.Parent = MainFrame
+    ContentContainer.Name = "ContentContainer"; ContentContainer.Size = UDim2.new(0, 365, 0, 300); ContentContainer.Position = UDim2.new(0, 162, 0, 50); ContentContainer.BackgroundTransparency = 1; ContentContainer.Parent = MainFrame
 
-    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownFrame = nil, activeDropdownContainer = nil }
+    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil, activeDropdownButton = nil, activeDropdownText = "" }
 
-    function InterfacciaEngine:CreaTab(name, idIcona)
+    function InterfacciaEngine:CreaTab(name, order)
         local contentFrame = Instance.new("ScrollingFrame")
-        contentFrame.Name = name .. "Tab"; contentFrame.Size = UDim2.new(1, 0, 1, 0); contentFrame.BackgroundTransparency = 1; contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0); contentFrame.ScrollBarThickness = 3; contentFrame.ScrollBarImageColor3 = Color3.fromRGB(45, 45, 50); contentFrame.Visible = false; contentFrame.Parent = ContentContainer
-        local listLayout = Instance.new("UIListLayout"); listLayout.Padding = UDim.new(0, 6); listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center; listLayout.SortOrder = Enum.SortOrder.LayoutOrder; listLayout.Parent = contentFrame
-        listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 15) end)
+        contentFrame.Name = name .. "Tab"; contentFrame.Size = UDim2.new(1, 0, 1, 0); contentFrame.BackgroundTransparency = 1; contentFrame.CanvasSize = UDim2.new(0, 0, 0, 500); contentFrame.ScrollBarThickness = 2; contentFrame.ScrollBarImageColor3 = Color3.fromRGB(40, 40, 45); contentFrame.Visible = false; contentFrame.ClipsDescendants = true; contentFrame.Parent = ContentContainer
+        local listLayout = Instance.new("UIListLayout"); listLayout.Padding = UDim.new(0, 8); listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center; listLayout.SortOrder = Enum.SortOrder.LayoutOrder; listLayout.Parent = contentFrame
+        listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() contentFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 20) end)
         InterfacciaEngine.tabs[name] = contentFrame
 
         local tabBtn = Instance.new("TextButton")
-        tabBtn.Name = name .. "Btn"; tabBtn.Size = UDim2.new(1, -5, 0, 36); tabBtn.BackgroundColor3 = Color3.fromRGB(24, 24, 26); tabBtn.Text = "" ; tabBtn.Parent = SideBar
+        tabBtn.Size = UDim2.new(1, 0, 0, 34); tabBtn.BackgroundColor3 = Color3.fromRGB(18, 18, 20); tabBtn.TextColor3 = Color3.fromRGB(140, 140, 145); tabBtn.Font = Enum.Font.GothamSemibold; tabBtn.TextSize = 12; tabBtn.Text = name; tabBtn.LayoutOrder = order or 0; tabBtn.Parent = SideBar
         local btnCorner = Instance.new("UICorner"); btnCorner.CornerRadius = UDim.new(0, 6); btnCorner.Parent = tabBtn
-        local btnStroke = Instance.new("UIStroke"); btnStroke.Thickness = 1; btnStroke.Color = Color3.fromRGB(32, 32, 35); btnStroke.Parent = tabBtn
-
-        local indicator = Instance.new("Frame")
-        indicator.Size = UDim2.new(0, 3, 0, 16); indicator.Position = UDim2.new(0, 0, 0.5, -8); indicator.BackgroundColor3 = ColoreAccento; indicator.BackgroundTransparency = 1; indicator.Parent = tabBtn
-        local indCorner = Instance.new("UICorner"); indCorner.Parent = indicator
-
-        local offsetTesto = 12
-        if idIcona and idIcona ~= "" then
-            local tIcon = Instance.new("ImageLabel")
-            tIcon.Size = UDim2.new(0, 16, 0, 16); tIcon.Position = UDim2.new(0, 10, 0.5, -8); tIcon.BackgroundTransparency = 1; tIcon.Image = "rbxassetid://" .. tostring(idIcona):match("%d+")
-            tIcon.ImageColor3 = ColoreTestoSecondario; tIcon.Parent = tabBtn
-            offsetTesto = 32
-        end
-
-        local tLabel = Instance.new("TextLabel")
-        tLabel.Size = UDim2.new(1, -offsetTesto, 1, 0); tLabel.Position = UDim2.new(0, offsetTesto, 0, 0); tLabel.BackgroundTransparency = 1; tLabel.TextColor3 = ColoreTestoSecondario; tLabel.Font = Enum.Font.GothamMedium; tLabel.TextSize = 12; tLabel.TextXAlignment = Enum.TextXAlignment.Left; tLabel.Text = name; tLabel.Parent = tabBtn
+        local btnStroke = Instance.new("UIStroke"); btnStroke.Thickness = 1; btnStroke.Color = Color3.fromRGB(26, 26, 28); btnStroke.Parent = tabBtn
 
         if not InterfacciaEngine.primaTab then 
-            InterfacciaEngine.primaTab = name; contentFrame.Visible = true; tLabel.TextColor3 = ColoreTestoPrincipale; tabBtn.BackgroundColor3 = ColoreElemento; indicator.BackgroundTransparency = 0
+            InterfacciaEngine.primaTab = name; contentFrame.Visible = true; tabBtn.BackgroundColor3 = Color3.fromRGB(16, 26, 22); tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255); btnStroke.Color = VerdeTema
         end
 
         tabBtn.MouseButton1Click:Connect(function()
+            if InterfacciaEngine.activeDropdownFrame then
+                InterfacciaEngine.activeDropdownButton.Text = "  " .. InterfacciaEngine.activeDropdownText:upper() .. "  ▼"
+                InterfacciaEngine.activeDropdownFrame.Visible = false; InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0); InterfacciaEngine.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                InterfacciaEngine.activeDropdownFrame = nil; InterfacciaEngine.activeDropdownContainer = nil
+            end
             for tName, frame in pairs(InterfacciaEngine.tabs) do frame.Visible = (tName == name) end
-            for bName, bObj in pairs(InterfacciaEngine.tabButtons) do
-                if bName == name then
-                    ApplicaTween(bObj, 0.15, {BackgroundColor3 = ColoreElemento})
-                    ApplicaTween(bObj.TextLabel, 0.15, {TextColor3 = ColoreTestoPrincipale})
-                    ApplicaTween(bObj.Frame, 0.15, {BackgroundTransparency = 0})
-                else
-                    ApplicaTween(bObj, 0.15, {BackgroundColor3 = Color3.fromRGB(24, 24, 26)})
-                    ApplicaTween(bObj.TextLabel, 0.15, {TextColor3 = ColoreTestoSecondario})
-                    ApplicaTween(bObj.Frame, 0.15, {BackgroundTransparency = 1})
-                end
+            for bName, btn in pairs(InterfacciaEngine.tabButtons) do
+                if bName == name then ApplicaTween(btn, 0.15, {BackgroundColor3 = Color3.fromRGB(16, 26, 22), TextColor3 = Color3.fromRGB(255, 255, 255)}); btn.UIStroke.Color = VerdeTema
+                else ApplicaTween(btn, 0.15, {BackgroundColor3 = Color3.fromRGB(18, 18, 20), TextColor3 = Color3.fromRGB(140, 140, 145)}); btn.UIStroke.Color = Color3.fromRGB(26, 26, 28) end
             end
         end)
         InterfacciaEngine.tabButtons[name] = tabBtn
         return contentFrame
     end
 
-    function InterfacciaEngine:AggiungiParagraph(parentTab, titleText)
-        local pLabel = Instance.new("TextLabel")
-        pLabel.Size = UDim2.new(0.96, 0, 0, 26); pLabel.BackgroundTransparency = 1; pLabel.TextColor3 = ColoreTestoPrincipale; pLabel.Font = Enum.Font.GothamBold; pLabel.TextSize = 13; pLabel.TextXAlignment = Enum.TextXAlignment.Left; pLabel.Text = titleText; pLabel.Parent = parentTab
-        return pLabel
-    end
-
     function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
-        local container = Instance.new("Frame"); container.Size = UDim2.new(0.96, 0, 0, 40); container.BackgroundColor3 = Color3.fromRGB(24, 24, 26); container.Parent = parentTab
+        local container = Instance.new("Frame"); container.Size = UDim2.new(0.95, 0, 0, 48); container.BackgroundColor3 = Color3.fromRGB(15, 15, 17); container.Parent = parentTab
         local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0, 6); corner.Parent = container
-        
-        local titleLabel = Instance.new("TextLabel"); titleLabel.Size = UDim2.new(0.7, 0, 0, 18); titleLabel.Position = UDim2.new(0, 12, 0, 3); titleLabel.BackgroundTransparency = 1; titleLabel.TextColor3 = ColoreTestoPrincipale; titleLabel.Font = Enum.Font.GothamMedium; titleLabel.TextSize = 12; titleLabel.TextXAlignment = Enum.TextXAlignment.Left; titleLabel.Text = titleText; titleLabel.Parent = container
-        local descLabel = Instance.new("TextLabel"); descLabel.Size = UDim2.new(0.7, 0, 0, 14); descLabel.Position = UDim2.new(0, 12, 0, 20); descLabel.BackgroundTransparency = 1; descLabel.TextColor3 = ColoreTestoSecondario; descLabel.Font = Enum.Font.Gotham; descLabel.TextSize = 10; descLabel.TextXAlignment = Enum.TextXAlignment.Left; descLabel.Text = descText; descLabel.Parent = container
-        
-        local toggleBg = Instance.new("Frame"); toggleBg.Size = UDim2.new(0, 34, 0, 18); toggleBg.Position = UDim2.new(1, -44, 0.5, -9); toggleBg.BackgroundColor3 = Color3.fromRGB(40, 40, 44); toggleBg.Parent = container
+        local stroke = Instance.new("UIStroke"); stroke.Thickness = 1; stroke.Color = Color3.fromRGB(24, 24, 27); stroke.Parent = container
+        local titleLabel = Instance.new("TextLabel"); titleLabel.Size = UDim2.new(0.7, 0, 0, 20); titleLabel.Position = UDim2.new(0, 12, 0, 5); titleLabel.BackgroundTransparency = 1; titleLabel.TextColor3 = Color3.fromRGB(240, 240, 245); titleLabel.Font = Enum.Font.GothamSemibold; titleLabel.TextSize = 12; titleLabel.TextXAlignment = Enum.TextXAlignment.Left; titleLabel.Text = titleText; titleLabel.Parent = container
+        local descLabel = Instance.new("TextLabel"); descLabel.Size = UDim2.new(0.7, 0, 0, 18); descLabel.Position = UDim2.new(0, 12, 0, 23); descLabel.BackgroundTransparency = 1; descLabel.TextColor3 = Color3.fromRGB(120, 120, 125); descLabel.Font = Enum.Font.SourceSans; descLabel.TextSize = 12; descLabel.TextXAlignment = Enum.TextXAlignment.Left; descLabel.Text = descText; descLabel.Parent = container
+        local toggleBg = Instance.new("Frame"); toggleBg.Size = UDim2.new(0, 38, 0, 20); toggleBg.Position = UDim2.new(1, -50, 0.5, -10); toggleBg.BackgroundColor3 = Color3.fromRGB(30, 30, 35); toggleBg.Parent = container
         local toggleBgCorner = Instance.new("UICorner"); toggleBgCorner.CornerRadius = UDim.new(1, 0); toggleBgCorner.Parent = toggleBg
-        local toggleBall = Instance.new("Frame"); toggleBall.Size = UDim2.new(0, 12, 0, 12); toggleBall.Position = UDim2.new(0, 3, 0, 3); toggleBall.BackgroundColor3 = Color3.fromRGB(180, 180, 185); toggleBall.Parent = toggleBg
+        local toggleBall = Instance.new("Frame"); toggleBall.Size = UDim2.new(0, 14, 0, 14); toggleBall.Position = UDim2.new(0, 3, 0, 3); toggleBall.BackgroundColor3 = Color3.fromRGB(150, 150, 155); toggleBall.Parent = toggleBg
         local toggleBallCorner = Instance.new("UICorner"); toggleBallCorner.CornerRadius = UDim.new(1, 0); toggleBallCorner.Parent = toggleBall
-        
         local clickBtn = Instance.new("TextButton"); clickBtn.Size = UDim2.new(1, 0, 1, 0); clickBtn.BackgroundTransparency = 1; clickBtn.Text = ""; clickBtn.Parent = container
 
         local state = defaultState
         local function updateVisual(smooth)
-            local targetBg = state and ColoreAccento or Color3.fromRGB(40, 40, 44)
-            local targetPos = state and UDim2.new(0, 19, 0, 3) or UDim2.new(0, 3, 0, 3)
-            local targetBallColor = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 180, 185)
-            if smooth then ApplicaTween(toggleBg, 0.15, {BackgroundColor3 = targetBg}); ApplicaTween(toggleBall, 0.15, {Position = targetPos, BackgroundColor3 = targetBallColor})
+            local targetBg = state and VerdeTemaHover or Color3.fromRGB(30, 30, 35)
+            local targetPos = state and UDim2.new(0, 21, 0, 3) or UDim2.new(0, 3, 0, 3)
+            local targetBallColor = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 155)
+            if smooth then ApplicaTween(toggleBg, 0.2, {BackgroundColor3 = targetBg}); ApplicaTween(toggleBall, 0.18, {Position = targetPos, BackgroundColor3 = targetBallColor})
             else toggleBg.BackgroundColor3 = targetBg; toggleBall.Position = targetPos; toggleBall.BackgroundColor3 = targetBallColor end
         end
         updateVisual(false)
@@ -223,50 +188,40 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    function InterfacciaEngine:AggiungiBottone(parentTab, buttonText, callback)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0.96, 0, 0, 34); btn.BackgroundColor3 = Color3.fromRGB(24, 24, 26); btn.TextColor3 = ColoreTestoPrincipale; btn.Font = Enum.Font.GothamMedium; btn.TextSize = 12; btn.Text = buttonText; btn.Parent = parentTab
-        local bCorner = Instance.new("UICorner"); bCorner.CornerRadius = UDim.new(0, 6); bCorner.Parent = btn
-        local bStroke = Instance.new("UIStroke"); bStroke.Thickness = 1; bStroke.Color = Color3.fromRGB(34, 34, 38); bStroke.Parent = btn
-
-        btn.MouseEnter:Connect(function() ApplicaTween(btn, 0.1, {BackgroundColor3 = ColoreElemento}) end)
-        btn.MouseLeave:Connect(function() ApplicaTween(btn, 0.1, {BackgroundColor3 = Color3.fromRGB(24, 24, 26)}) end)
-        btn.MouseButton1Click:Connect(callback)
-        return btn
-    end
-
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
-        local currentText = defaultText
-        local dropContainer = Instance.new("Frame"); dropContainer.Size = UDim2.new(0.96, 0, 0, 34); dropContainer.BackgroundTransparency = 1; dropContainer.ClipsDescendants = true; dropContainer.Parent = parentTab
-        
-        local dropBtn = Instance.new("TextButton"); dropBtn.Size = UDim2.new(1, 0, 0, 34); dropBtn.BackgroundColor3 = Color3.fromRGB(24, 24, 26); dropBtn.TextColor3 = ColoreTestoPrincipale; dropBtn.Font = Enum.Font.GothamMedium; dropBtn.TextSize = 12; dropBtn.Text = "  " .. currentText .. "    ▼"; dropBtn.TextXAlignment = Enum.TextXAlignment.Left; dropBtn.Parent = dropContainer
-        local dCorner = Instance.new("UICorner"); dCorner.CornerRadius = UDim.new(0, 6); dCorner.Parent = dropBtn
-        
-        local dropListFrame = Instance.new("ScrollingFrame"); dropListFrame.Size = UDim2.new(1, 0, 0, 0); dropListFrame.Position = UDim2.new(0, 0, 0, 36); dropListFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 20); dropListFrame.ScrollBarThickness = 2; dropListFrame.Visible = false; dropListFrame.Parent = dropContainer
-        local dlList = Instance.new("UIListLayout"); dlList.SortOrder = Enum.SortOrder.LayoutOrder; dlList.Parent = dropListFrame
+        local currentSelectedText = defaultText
+        local dropContainer = Instance.new("Frame"); dropContainer.Size = UDim2.new(0.95, 0, 0, 35); dropContainer.BackgroundTransparency = 1; dropContainer.ClipsDescendants = true; dropContainer.Parent = parentTab
+        local dropBtn = Instance.new("TextButton"); dropBtn.Size = UDim2.new(1, 0, 0, 35); dropBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 17); dropBtn.TextColor3 = VerdeTema; dropBtn.Font = Enum.Font.GothamBold; dropBtn.TextSize = 11; dropBtn.Text = "  " .. currentSelectedText:upper() .. "  ▼"; dropBtn.TextXAlignment = Enum.TextXAlignment.Left; dropBtn.Parent = dropContainer
+        local dropCorner = Instance.new("UICorner"); dropCorner.CornerRadius = UDim.new(0, 6); dropCorner.Parent = dropBtn
+        local dropStroke = Instance.new("UIStroke"); dropStroke.Thickness = 1; dropStroke.Color = Color3.fromRGB(24, 24, 27); dropStroke.Parent = dropBtn
+        local dropListFrame = Instance.new("ScrollingFrame"); dropListFrame.Name = "DropList"; dropListFrame.Size = UDim2.new(1, 0, 0, 0); dropListFrame.Position = UDim2.new(0, 0, 0, 38); dropListFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 14); dropListFrame.Visible = false; dropListFrame.ScrollBarThickness = 2; dropListFrame.ScrollBarImageColor3 = VerdeTema; dropListFrame.CanvasSize = UDim2.new(0, 0, 0, #options * 30); dropListFrame.Parent = dropContainer
+        local dCorner = Instance.new("UICorner"); dCorner.CornerRadius = UDim.new(0, 6); dCorner.Parent = dropListFrame
+        local dStroke = Instance.new("UIStroke"); dStroke.Thickness = 1; dStroke.Color = Color3.fromRGB(35, 35, 40); dStroke.Parent = dropListFrame
+        local dropLayout = Instance.new("UIListLayout"); dropLayout.SortOrder = Enum.SortOrder.LayoutOrder; dropLayout.Parent = dropListFrame
 
         for i, val in ipairs(options) do
-            local optText = tostring(val.Text or val)
-            local optVal = val.Value or val
-            local opt = Instance.new("TextButton"); opt.Size = UDim2.new(1, 0, 0, 28); opt.BackgroundColor3 = Color3.fromRGB(18, 18, 20); opt.TextColor3 = ColoreTestoSecondario; opt.Font = Enum.Font.Gotham; opt.TextSize = 12; opt.Text = "    " .. optText; opt.TextXAlignment = Enum.TextXAlignment.Left; opt.LayoutOrder = i; opt.Parent = dropListFrame
-            
-            opt.MouseEnter:Connect(function() ApplicaTween(opt, 0.1, {BackgroundColor3 = Color3.fromRGB(26, 26, 30), TextColor3 = ColoreTestoPrincipale}) end)
-            opt.MouseLeave:Connect(function() ApplicaTween(opt, 0.1, {BackgroundColor3 = Color3.fromRGB(18, 18, 20), TextColor3 = ColoreTestoSecondario}) end)
-            opt.MouseButton1Click:Connect(function()
-                currentText = optText; dropBtn.Text = "  " .. currentText .. "    ▼"
-                dropListFrame.Visible = false; dropContainer.Size = UDim2.new(0.96, 0, 0, 34)
-                callback(optVal)
+            local opt = Instance.new("TextButton"); opt.Size = UDim2.new(1, 0, 0, 30); opt.BackgroundColor3 = Color3.fromRGB(14, 14, 16); opt.TextColor3 = Color3.fromRGB(200, 200, 205); opt.Font = Enum.Font.SourceSans; opt.TextSize = 13; opt.Text = "    " .. tostring(val.Text or val); opt.TextXAlignment = Enum.TextXAlignment.Left; opt.LayoutOrder = i; opt.Parent = dropListFrame
+            opt.MouseEnter:Connect(function() ApplicaTween(opt, 0.15, {BackgroundColor3 = Color3.fromRGB(16, 26, 22), TextColor3 = Color3.fromRGB(255, 255, 255)}) end)
+            opt.MouseLeave:Connect(function() ApplicaTween(opt, 0.15, {BackgroundColor3 = Color3.fromRGB(14, 14, 16), TextColor3 = Color3.fromRGB(200, 200, 205)}) end)
+            opt.Activated:Connect(function()
+                currentSelectedText = tostring(val.Text or val); dropBtn.Text = "  " .. currentSelectedText:upper() .. "  ▼"; dropListFrame.Visible = false; dropListFrame.Size = UDim2.new(1, 0, 0, 0); dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                InterfacciaEngine.activeDropdownFrame = nil; InterfacciaEngine.activeDropdownContainer = nil; InterfacciaEngine.activeDropdownButton = nil
+                callback(val.Value or val)
             end)
         end
 
-        dropBtn.MouseButton1Click:Connect(function()
+        dropBtn.Activated:Connect(function()
             if dropListFrame.Visible then
-                dropListFrame.Visible = false; dropContainer.Size = UDim2.new(0.96, 0, 0, 34)
+                dropBtn.Text = "  " .. currentSelectedText:upper() .. "  ▼"; dropListFrame.Visible = false; dropListFrame.Size = UDim2.new(1, 0, 0, 0); dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                InterfacciaEngine.activeDropdownFrame = nil; InterfacciaEngine.activeDropdownContainer = nil; InterfacciaEngine.activeDropdownButton = nil
             else
-                dropListFrame.Visible = true
-                local altezzaCalculata = math.min(#options * 28, 115)
-                dropListFrame.Size = UDim2.new(1, 0, 0, altezzaCalculata)
-                dropContainer.Size = UDim2.new(0.96, 0, 0, 36 + altezzaCalculata)
+                if InterfacciaEngine.activeDropdownFrame and InterfacciaEngine.activeDropdownFrame ~= dropListFrame then
+                    InterfacciaEngine.activeDropdownButton.Text = "  " .. InterfacciaEngine.activeDropdownText:upper() .. "  ▼"; InterfacciaEngine.activeDropdownFrame.Visible = false; InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0); InterfacciaEngine.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
+                end
+                dropBtn.Text = "  " .. currentSelectedText:upper() .. "  ▲"; dropListFrame.Visible = true
+                local altezzaLista = math.min(#options * 30, 120)
+                dropListFrame.Size = UDim2.new(1, 0, 0, altezzaLista); dropContainer.Size = UDim2.new(0.95, 0, 0, 35 + altezzaLista + 5)
+                InterfacciaEngine.activeDropdownFrame = dropListFrame; InterfacciaEngine.activeDropdownContainer = dropContainer; InterfacciaEngine.activeDropdownButton = dropBtn; InterfacciaEngine.activeDropdownText = currentSelectedText
             end
         end)
     end
