@@ -1,5 +1,5 @@
 -- =============================================================================
--- SCORPION X - PREMIUM UI LIBRARY ENGINE (ULTRA-MODERN EDITION)
+-- SCORPION X - EMERALD CYBER EDITION (PREMIUM UI ENGINE)
 -- =============================================================================
 local Library = {}
 
@@ -55,6 +55,10 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui", 10) or player.PlayerGui
 
+    -- Colore Tema: Verde Smeraldo Scuro Premium
+    local VerdeTema = Color3.fromRGB(0, 180, 100)
+    local VerdeTemaHover = Color3.fromRGB(0, 140, 75)
+
     -- Rimozione vecchie istanze
     local oldGui = playerGui:FindFirstChild("ScorpioXMenu") or CoreGui:FindFirstChild("ScorpioXMenu")
     if oldGui then oldGui:Destroy() end
@@ -97,7 +101,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     TopBarCorner.CornerRadius = UDim.new(0, 12)
     TopBarCorner.Parent = TopBar
 
-    -- Frame correttivo per nascondere gli angoli arrotondati inferiori della topbar
     local TopBarLine = Instance.new("Frame")
     TopBarLine.Size = UDim2.new(1, 0, 0, 1)
     TopBarLine.Position = UDim2.new(0, 0, 1, -1)
@@ -105,7 +108,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     TopBarLine.BorderSizePixel = 0
     TopBarLine.Parent = TopBar
 
-    -- ICONA NELL'ANGOLO DELLA TOPBAR
     local TopBarIcon
     if idIconaPulsante and idIconaPulsante ~= "" then
         local pulitoID = tostring(idIconaPulsante):match("%d+")
@@ -116,7 +118,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     else
         TopBarIcon = Instance.new("TextLabel")
         TopBarIcon.Text = "⚡"
-        TopBarIcon.TextColor3 = Color3.fromRGB(150, 255, 0)
+        TopBarIcon.TextColor3 = VerdeTema
         TopBarIcon.Font = Enum.Font.SourceSansBold
         TopBarIcon.TextSize = 14
         TopBarIcon.BackgroundTransparency = 1
@@ -126,7 +128,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     TopBarIcon.Position = UDim2.new(0, 12, 0.5, -11)
     TopBarIcon.Parent = TopBar
 
-    -- TITOLO HUB
     local TitleLabel = Instance.new("TextLabel")
     TitleLabel.Size = UDim2.new(1, -60, 1, 0)
     TitleLabel.Position = UDim2.new(0, 42, 0, 0)
@@ -151,7 +152,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     else
         ToggleMenuBtn = Instance.new("TextButton")
         ToggleMenuBtn.Text = "SCO X"
-        ToggleMenuBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
+        ToggleMenuBtn.TextColor3 = VerdeTema
         ToggleMenuBtn.Font = Enum.Font.GothamBold
         ToggleMenuBtn.TextSize = 12
         ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(16, 16, 18)
@@ -171,14 +172,13 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 
     local UIStrokeBtn = Instance.new("UIStroke")
     UIStrokeBtn.Thickness = 1.5
-    UIStrokeBtn.Color = Color3.fromRGB(150, 255, 0)
+    UIStrokeBtn.Color = VerdeTema
     UIStrokeBtn.Parent = ToggleMenuBtn
 
     ToggleMenuBtn.MouseButton1Click:Connect(function()
         MainFrame.Visible = not MainFrame.Visible
     end)
 
-    -- CHIUSURA DA TASTIERA
     local menuBind = tastoChiusuraDefault or Enum.KeyCode.RightControl
     UserInputService.InputBegan:Connect(function(input, processed)
         if not processed and input.KeyCode == menuBind then
@@ -213,11 +213,11 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
     ContentContainer.BackgroundTransparency = 1
     ContentContainer.Parent = MainFrame
 
-    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil }
+    local InterfacciaEngine = { tabs = {}, tabButtons = {}, primaTab = nil, activeDropdownContainer = nil, activeDropdownFrame = nil, activeDropdownButton = nil, activeDropdownText = "" }
 
-    -- FUNZIONE: NOTIFICA TOAST ELEGANTE
+    -- FUNZIONE: NOTIFICA TOAST
     function Library:Notifica(titolo, messaggio, durata)
-        durata = duration or 4
+        durata = durata or 4
         local NotificationStorage = ScreenGui:FindFirstChild("NotificationStorage")
         if not NotificationStorage then
             NotificationStorage = Instance.new("Frame")
@@ -245,7 +245,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 
         local stroke = Instance.new("UIStroke")
         stroke.Thickness = 1
-        stroke.Color = Color3.fromRGB(150, 255, 0)
+        stroke.Color = VerdeTema
         stroke.Transparency = 1
         stroke.Parent = NotifFrame
 
@@ -253,7 +253,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         titleLabel.Size = UDim2.new(1, -20, 0, 22)
         titleLabel.Position = UDim2.new(0, 12, 0, 6)
         titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
+        titleLabel.TextColor3 = VerdeTema
         titleLabel.Font = Enum.Font.GothamBold
         titleLabel.TextSize = 12
         titleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -275,7 +275,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         msgLabel.Text = messaggio
         msgLabel.Parent = NotifFrame
 
-        -- Animazione di entrata (Fade in)
         ApplicaTween(NotifFrame, 0.3, {BackgroundTransparency = 0})
         ApplicaTween(stroke, 0.3, {Transparency = 0})
         ApplicaTween(titleLabel, 0.3, {TextTransparency = 0})
@@ -324,7 +323,6 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         tabBtn.Font = Enum.Font.GothamSemibold
         tabBtn.TextSize = 12
         tabBtn.Text = name
-        tabBtn.TextXAlignment = Enum.TextXAlignment.Center
         tabBtn.LayoutOrder = order or 0
         tabBtn.Parent = SideBar
 
@@ -340,19 +338,20 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         if not InterfacciaEngine.primaTab then InterfacciaEngine.primaTab = name end
 
         tabBtn.MouseEnter:Connect(function()
-            if InterfacciaEngine.tabButtons[name].TextColor3 ~= Color3.fromRGB(0, 0, 0) then
+            if InterfacciaEngine.tabButtons[name].TextColor3 ~= Color3.fromRGB(255, 255, 255) then
                 ApplicaTween(tabBtn, 0.2, {BackgroundColor3 = Color3.fromRGB(24, 24, 27), TextColor3 = Color3.fromRGB(200, 200, 205)})
             end
         end)
         
         tabBtn.MouseLeave:Connect(function()
-            if InterfacciaEngine.tabButtons[name].TextColor3 ~= Color3.fromRGB(0, 0, 0) then
+            if InterfacciaEngine.tabButtons[name].TextColor3 ~= Color3.fromRGB(255, 255, 255) then
                 ApplicaTween(tabBtn, 0.2, {BackgroundColor3 = Color3.fromRGB(18, 18, 20), TextColor3 = Color3.fromRGB(140, 140, 145)})
             end
         end)
 
         tabBtn.MouseButton1Click:Connect(function()
             if InterfacciaEngine.activeDropdownFrame then
+                InterfacciaEngine.activeDropdownButton.Text = "  " .. InterfacciaEngine.activeDropdownText:upper() .. "  ▼"
                 InterfacciaEngine.activeDropdownFrame.Visible = false
                 InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
                 InterfacciaEngine.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
@@ -362,8 +361,8 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
             for tName, frame in pairs(InterfacciaEngine.tabs) do frame.Visible = (tName == name) end
             for bName, btn in pairs(InterfacciaEngine.tabButtons) do
                 if bName == name then
-                    ApplicaTween(btn, 0.15, {BackgroundColor3 = Color3.fromRGB(150, 255, 0), TextColor3 = Color3.fromRGB(0, 0, 0)})
-                    btn.UIStroke.Color = Color3.fromRGB(150, 255, 0)
+                    ApplicaTween(btn, 0.15, {BackgroundColor3 = Color3.fromRGB(16, 26, 22), TextColor3 = Color3.fromRGB(255, 255, 255)})
+                    btn.UIStroke.Color = VerdeTema
                 else
                     ApplicaTween(btn, 0.15, {BackgroundColor3 = Color3.fromRGB(18, 18, 20), TextColor3 = Color3.fromRGB(140, 140, 145)})
                     btn.UIStroke.Color = Color3.fromRGB(26, 26, 28)
@@ -375,7 +374,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return contentFrame
     end
 
-    -- ELEMENTO: SEZIONE MODERNA (Con linea geometrica reale)
+    -- SEZIONE
     function InterfacciaEngine:AggiungiSezione(parentTab, text)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 28)
@@ -402,7 +401,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- ELEMENTO: PARAGRAFO
+    -- PARAGRAFO
     function InterfacciaEngine:AggiungiParagrafo(parentTab, titoloTesto, corpoTesto)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 60)
@@ -422,7 +421,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         titleLabel.Size = UDim2.new(1, -20, 0, 20)
         titleLabel.Position = UDim2.new(0, 10, 0, 6)
         titleLabel.BackgroundTransparency = 1
-        titleLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
+        titleLabel.TextColor3 = VerdeTema
         titleLabel.Font = Enum.Font.GothamBold
         titleLabel.TextSize = 11
         titleLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -449,12 +448,12 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- ELEMENTO: BUTTON (Con animazione hover reattiva)
+    -- ELEMENTO: BUTTON (Emerald Cyber Redesign)
     function InterfacciaEngine:AggiungiButton(parentTab, text, callback)
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(0.95, 0, 0, 34)
-        btn.BackgroundColor3 = Color3.fromRGB(16, 16, 18)
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.BackgroundColor3 = Color3.fromRGB(14, 18, 16)
+        btn.TextColor3 = Color3.fromRGB(240, 240, 245)
         btn.Font = Enum.Font.GothamSemibold
         btn.TextSize = 12
         btn.Text = text
@@ -465,15 +464,15 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         btnCorner.Parent = btn
         
         local btnStroke = Instance.new("UIStroke")
-        btnStroke.Thickness = 1
-        btnStroke.Color = Color3.fromRGB(150, 255, 0)
+        btnStroke.Thickness = 1.2
+        btnStroke.Color = VerdeTema
         btnStroke.Parent = btn
 
         btn.MouseEnter:Connect(function()
-            ApplicaTween(btn, 0.2, {BackgroundColor3 = Color3.fromRGB(150, 255, 0), TextColor3 = Color3.fromRGB(0, 0, 0)})
+            ApplicaTween(btn, 0.2, {BackgroundColor3 = VerdeTema, TextColor3 = Color3.fromRGB(10, 10, 12)})
         end)
         btn.MouseLeave:Connect(function()
-            ApplicaTween(btn, 0.2, {BackgroundColor3 = Color3.fromRGB(16, 16, 18), TextColor3 = Color3.fromRGB(255, 255, 255)})
+            ApplicaTween(btn, 0.2, {BackgroundColor3 = Color3.fromRGB(14, 18, 16), TextColor3 = Color3.fromRGB(240, 240, 245)})
         end)
 
         btn.MouseButton1Click:Connect(function()
@@ -486,7 +485,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return btn
     end
 
-    -- ELEMENTO: TOGGLE
+    -- ELEMENTO: TOGGLE (Emerald Cyber Redesign)
     function InterfacciaEngine:AggiungiToggle(parentTab, titleText, descText, defaultState, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 48)
@@ -552,9 +551,9 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 
         local state = defaultState
         local function updateVisual(smooth)
-            local targetBg = state and Color3.fromRGB(150, 255, 0) or Color3.fromRGB(30, 30, 35)
+            local targetBg = state and VerdeTemaHover or Color3.fromRGB(30, 30, 35)
             local targetPos = state and UDim2.new(0, 21, 0, 3) or UDim2.new(0, 3, 0, 3)
-            local targetBallColor = state and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(150, 150, 155)
+            local targetBallColor = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 155)
             
             if smooth then
                 ApplicaTween(toggleBg, 0.2, {BackgroundColor3 = targetBg})
@@ -576,8 +575,10 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- ELEMENTO: DROPDOWN
+    -- ELEMENTO: DROPDOWN (Con triangolo dinamico aperto/chiuso e tema smeraldo)
     function InterfacciaEngine:AggiungiDropdown(parentTab, options, defaultText, callback)
+        local currentSelectedText = defaultText
+        
         local dropContainer = Instance.new("Frame")
         dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
         dropContainer.BackgroundTransparency = 1
@@ -587,10 +588,10 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         local dropBtn = Instance.new("TextButton")
         dropBtn.Size = UDim2.new(1, 0, 0, 35)
         dropBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 17)
-        dropBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
+        dropBtn.TextColor3 = VerdeTema
         dropBtn.Font = Enum.Font.GothamBold
         dropBtn.TextSize = 11
-        dropBtn.Text = "  " .. defaultText:upper() .. "  ▼"
+        dropBtn.Text = "  " .. currentSelectedText:upper() .. "  ▼"
         dropBtn.TextXAlignment = Enum.TextXAlignment.Left
         dropBtn.Parent = dropContainer
 
@@ -610,7 +611,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         dropListFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 14)
         dropListFrame.Visible = false
         dropListFrame.ScrollBarThickness = 2
-        dropListFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 255, 0)
+        dropListFrame.ScrollBarImageColor3 = VerdeTema
         dropListFrame.CanvasSize = UDim2.new(0, 0, 0, #options * 30)
         dropListFrame.Parent = dropContainer
         
@@ -639,34 +640,40 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
             opt.LayoutOrder = i
             opt.Parent = dropListFrame
 
-            opt.MouseEnter:Connect(function() ApplicaTween(opt, 0.15, {BackgroundColor3 = Color3.fromRGB(22, 22, 26), TextColor3 = Color3.fromRGB(255, 255, 255)}) end)
+            opt.MouseEnter:Connect(function() ApplicaTween(opt, 0.15, {BackgroundColor3 = Color3.fromRGB(16, 26, 22), TextColor3 = Color3.fromRGB(255, 255, 255)}) end)
             opt.MouseLeave:Connect(function() ApplicaTween(opt, 0.15, {BackgroundColor3 = Color3.fromRGB(14, 14, 16), TextColor3 = Color3.fromRGB(200, 200, 205)}) end)
 
             opt.Activated:Connect(function()
-                dropBtn.Text = "  " .. tostring(val.Text or val):upper() .. "  ▼"
+                currentSelectedText = tostring(val.Text or val)
+                dropBtn.Text = "  " .. currentSelectedText:upper() .. "  ▼"
                 dropListFrame.Visible = false
                 dropListFrame.Size = UDim2.new(1, 0, 0, 0)
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
                 InterfacciaEngine.activeDropdownFrame = nil
                 InterfacciaEngine.activeDropdownContainer = nil
+                InterfacciaEngine.activeDropdownButton = nil
                 callback(val.Value or val)
             end)
         end
 
         dropBtn.Activated:Connect(function()
             if dropListFrame.Visible then
+                dropBtn.Text = "  " .. currentSelectedText:upper() .. "  ▼"
                 dropListFrame.Visible = false
                 dropListFrame.Size = UDim2.new(1, 0, 0, 0)
                 dropContainer.Size = UDim2.new(0.95, 0, 0, 35)
                 InterfacciaEngine.activeDropdownFrame = nil
                 InterfacciaEngine.activeDropdownContainer = nil
+                InterfacciaEngine.activeDropdownButton = nil
             else
                 if InterfacciaEngine.activeDropdownFrame and InterfacciaEngine.activeDropdownFrame ~= dropListFrame then
+                    InterfacciaEngine.activeDropdownButton.Text = "  " .. InterfacciaEngine.activeDropdownText:upper() .. "  ▼"
                     InterfacciaEngine.activeDropdownFrame.Visible = false
                     InterfacciaEngine.activeDropdownFrame.Size = UDim2.new(1, 0, 0, 0)
                     InterfacciaEngine.activeDropdownContainer.Size = UDim2.new(0.95, 0, 0, 35)
                 end
                 
+                dropBtn.Text = "  " .. currentSelectedText:upper() .. "  ▲"
                 dropListFrame.Visible = true
                 local altezzaLista = math.min(#options * 30, 120)
                 dropListFrame.Size = UDim2.new(1, 0, 0, altezzaLista)
@@ -674,11 +681,13 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
                 
                 InterfacciaEngine.activeDropdownFrame = dropListFrame
                 InterfacciaEngine.activeDropdownContainer = dropContainer
+                InterfacciaEngine.activeDropdownButton = dropBtn
+                InterfacciaEngine.activeDropdownText = currentSelectedText
             end
         end)
     end
 
-    -- ELEMENTO: SLIDER (Ultra Responsive)
+    -- ELEMENTO: SLIDER
     function InterfacciaEngine:AggiungiSlider(parentTab, titleText, min, max, default, callback)
         local container = Instance.new("Frame")
         container.Size = UDim2.new(0.95, 0, 0, 52)
@@ -704,7 +713,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         valueLabel.Size = UDim2.new(0.25, 0, 0, 20)
         valueLabel.Position = UDim2.new(0.7, 8, 0, 6)
         valueLabel.BackgroundTransparency = 1
-        valueLabel.TextColor3 = Color3.fromRGB(150, 255, 0)
+        valueLabel.TextColor3 = VerdeTema
         valueLabel.Font = Enum.Font.GothamBold
         valueLabel.TextSize = 12
         valueLabel.TextXAlignment = Enum.TextXAlignment.Right
@@ -723,7 +732,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
 
         local sliderFill = Instance.new("Frame")
         sliderFill.Size = UDim2.new(math.clamp((default - min) / (max - min), 0, 1), 0, 1, 0)
-        sliderFill.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
+        sliderFill.BackgroundColor3 = VerdeTema
         sliderFill.Parent = sliderBg
 
         local sliderFillCorner = Instance.new("UICorner")
@@ -812,7 +821,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         textBox.ClearTextOnFocus = false
         textBox.Parent = boxContainer
 
-        textBox.Focused:Connect(function() ApplicaTween(boxStroke, 0.2, {Color = Color3.fromRGB(150, 255, 0)}) end)
+        textBox.Focused:Connect(function() ApplicaTween(boxStroke, 0.2, {Color = VerdeTema}) end)
         textBox.FocusLost:Connect(function(enterPressed)
             ApplicaTween(boxStroke, 0.2, {Color = Color3.fromRGB(35, 35, 40)})
             callback(textBox.Text, enterPressed)
@@ -847,7 +856,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         bindBtn.Size = UDim2.new(0, 85, 0, 24)
         bindBtn.Position = UDim2.new(1, -97, 0.5, -12)
         bindBtn.BackgroundColor3 = Color3.fromRGB(22, 22, 26)
-        bindBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
+        bindBtn.TextColor3 = VerdeTema
         bindBtn.Font = Enum.Font.GothamBold
         bindBtn.TextSize = 10
         bindBtn.Text = defaultKey.Name:upper()
@@ -868,8 +877,8 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         bindBtn.MouseButton1Click:Connect(function()
             listening = true
             bindBtn.Text = "..."
-            ApplicaTween(bStroke, 0.15, {Color = Color3.fromRGB(255, 255, 0)})
-            bindBtn.TextColor3 = Color3.fromRGB(255, 255, 0)
+            ApplicaTween(bStroke, 0.15, {Color = Color3.fromRGB(200, 150, 0)})
+            bindBtn.TextColor3 = Color3.fromRGB(200, 150, 0)
         end)
 
         UserInputService.InputBegan:Connect(function(input, processed)
@@ -879,7 +888,7 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
                 currentKey = input.KeyCode
                 bindBtn.Text = currentKey.Name:upper()
                 ApplicaTween(bStroke, 0.15, {Color = Color3.fromRGB(35, 35, 40)})
-                bindBtn.TextColor3 = Color3.fromRGB(150, 255, 0)
+                bindBtn.TextColor3 = VerdeTema
                 callback(currentKey, false)
             elseif not listening and input.KeyCode == currentKey then
                 callback(currentKey, true)
@@ -889,16 +898,16 @@ function Library:Inizializza(titoloHub, idIconaPulsante, tastoChiusuraDefault)
         return container
     end
 
-    -- AUTO-OPEN INITIAL TAB
+    -- APERTURA AUTOMATICA PRIMA TAB
     task.spawn(function()
         task.wait(0.2)
         if InterfacciaEngine.primaTab and InterfacciaEngine.tabs[InterfacciaEngine.primaTab] then
             InterfacciaEngine.tabs[InterfacciaEngine.primaTab].Visible = true
             local btn = InterfacciaEngine.tabButtons[InterfacciaEngine.primaTab]
             if btn then
-                btn.BackgroundColor3 = Color3.fromRGB(150, 255, 0)
-                btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-                btn.UIStroke.Color = Color3.fromRGB(150, 255, 0)
+                btn.BackgroundColor3 = Color3.fromRGB(16, 26, 22)
+                btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                btn.UIStroke.Color = VerdeTema
             end
         end
     end)
